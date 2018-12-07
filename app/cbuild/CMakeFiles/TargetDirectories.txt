@@ -1,3 +1,0 @@
-/home/peto/git/AGReality/app/cbuild/CMakeFiles/rebuild_cache.dir
-/home/peto/git/AGReality/app/cbuild/CMakeFiles/edit_cache.dir
-/home/peto/git/AGReality/app/cbuild/CMakeFiles/native-lib.dir
