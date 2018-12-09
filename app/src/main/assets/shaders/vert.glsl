@@ -1,24 +1,24 @@
-#version 310 es
+#version 300 es
 
 uniform mat4 MMatrix;
 uniform mat4 VMatrix;
 uniform mat4 PMatrix;
 
-layout (location = 0) in vec3 vPos;
-layout (location = 1) in vec3 norm;
-layout (location = 2) in vec2 in_uv;
+in vec3 in_pos;
+in vec3 in_norm;
+in vec2 in_uv;
 
-layout (location = 0) out vec2 out_uv;
-layout (location = 1) out vec3 out_norm;
-layout (location = 2) out vec3 out_pos;
+out vec2 f_uv;
+out vec3 f_norm;
+out vec3 f_pos;
 
 void main(void)
 {
-    vec4 mpos = MMatrix * vec4(vPos, 1.0f);
+    vec4 mpos = MMatrix * vec4(in_pos, 1.0f);
 
-    out_uv = in_uv;
-    out_norm = norm;
-    out_pos = mpos.xyz;
+    f_uv = in_uv;
+    f_norm = in_norm;
+    f_pos = mpos.xyz;
 
     gl_Position = PMatrix * VMatrix *  mpos;
 }

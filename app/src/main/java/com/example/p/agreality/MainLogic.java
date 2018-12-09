@@ -26,7 +26,7 @@ public class MainLogic implements SimpleLogic {
 
 	private void loadModels() {
 		m.load();
-		sculpt.load();
+		//sculpt.load();
 		Camera2Manager.INSTANCE.start();
 		DeviceMovement.INSTANCE.start();
 	}
@@ -46,7 +46,7 @@ public class MainLogic implements SimpleLogic {
 		e.getAngle().x -= 90.0f;
 		e.getPosition().y -= 25.0f;
 		e.getPosition().z = -73.0f;
-		scene.getEntities().add(e);
+		//scene.getEntities().add(e);
 
 		//scene.getCamera().move(new Vector3f(0.0f, 0.0f, -10.0f));
 	}

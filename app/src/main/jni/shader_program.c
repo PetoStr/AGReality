@@ -23,6 +23,7 @@ void create_shader(struct shader_info *shdr, GLenum type)
 	shdr->id = glCreateShader(type);
 
 	char *src = read_file(shdr->file_name, NULL);
+	AGR_INFO("compiling shader:\n%s", src);
 	glShaderSource(shdr->id, 1, (const GLchar **) &src, NULL);
 	glCompileShader(shdr->id);
 
@@ -73,12 +74,24 @@ void link_shaders(GLint p, GLint vs, GLint fs)
 	check_gl_error("glDeleteShader");
 }
 
+void bind_attrib_locations(GLint program_id)
+{
+	glBindAttribLocation(program_id, 0, "in_pos");
+	check_gl_error("glBindAttribLocation");
+	glBindAttribLocation(program_id, 1, "in_norm");
+	check_gl_error("glBindAttribLocation");
+	glBindAttribLocation(program_id, 2, "in_uv");
+	check_gl_error("glBindAttribLocation");
+}
+
 void create_program(struct program_info *p)
 {
 	create_shader(&p->vs, GL_VERTEX_SHADER);
 	create_shader(&p->fs, GL_FRAGMENT_SHADER);
 
 	p->id = glCreateProgram();
+
+	bind_attrib_locations(p->id);
 
 	link_shaders(p->id, p->vs.id, p->fs.id);
 }

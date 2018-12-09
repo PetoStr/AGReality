@@ -19,7 +19,7 @@ void create_vertices_buffer(struct mesh_info *mesh,
 		glGenBuffers(1, &mesh->vbos[mesh->vbos_len]);
 		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[mesh->vbos_len]);
 		glBufferData(GL_ARRAY_BUFFER, pos_size, pos, GL_STATIC_DRAW);
-		glVertexAttribPointer(mesh->vbos_len, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 		mesh->vbos_len++;
 	}
 
@@ -27,7 +27,7 @@ void create_vertices_buffer(struct mesh_info *mesh,
 		glGenBuffers(1, &mesh->vbos[mesh->vbos_len]);
 		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[mesh->vbos_len]);
 		glBufferData(GL_ARRAY_BUFFER, norm_size, norms, GL_STATIC_DRAW);
-		glVertexAttribPointer(mesh->vbos_len, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 		mesh->vbos_len++;
 	}
 
@@ -35,7 +35,7 @@ void create_vertices_buffer(struct mesh_info *mesh,
 		glGenBuffers(1, &mesh->vbos[mesh->vbos_len]);
 		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[mesh->vbos_len]);
 		glBufferData(GL_ARRAY_BUFFER, tc_size, tc, GL_STATIC_DRAW);
-		glVertexAttribPointer(mesh->vbos_len, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 		mesh->vbos_len++;
 	}
 

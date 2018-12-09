@@ -2,11 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.p.agreality">
 
-    <uses-feature android:glEsVersion="0x00030001" android:required="true" />
+    <uses-feature android:glEsVersion="0x00030000" android:required="true" />
     <uses-feature android:name="android.hardware.camera2.full" android:required="true" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <!-- TODO is "android.permission.WRITE_EXTERNAL_STORAGE" required?-->
+    <!-- TODO is "android.permission.READ_EXTERNAL_STORAGE" required?-->
 
     <application
         android:allowBackup="true"

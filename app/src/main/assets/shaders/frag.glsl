@@ -1,4 +1,4 @@
-#version 310 es
+#version 300 es
 
 precision mediump float;
 
@@ -7,9 +7,9 @@ uniform bool has_texture;
 uniform sampler2D texture_diffuse;
 uniform sampler2D texture_specular;
 
-layout (location = 0) in vec2 uv;
-layout (location = 1) in vec3 norm;
-layout (location = 2) in vec3 vpos;
+in vec2 f_uv;
+in vec3 f_norm;
+in vec3 f_pos;
 
 out vec4 out_color;
 
@@ -43,8 +43,8 @@ void main(void)
 {
 	vec4 color;
 	if (has_texture) {
-		vec4 dc = texture(texture_diffuse, uv);
-		vec4 sc = texture(texture_specular, uv);
+		vec4 dc = texture(texture_diffuse, f_uv);
+		vec4 sc = texture(texture_specular, f_uv);
 
 		dir_light dlight;
 		dlight.direction = vec3(0.0, 1.0, -1.0);
