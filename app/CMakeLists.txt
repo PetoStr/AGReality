@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-add_compile_options(-Wall -Werror)
+add_compile_options(-Wall)# -Werror)
 
-include_directories(src/main/jni/include)
-include_directories(src/main/jni/external/stb_image/include)
+include_directories(${CMAKE_SOURCE_DIR}/src/main/jni/include)
+include_directories(${CMAKE_SOURCE_DIR}/src/main/jni/external/stb_image/include)
 
 add_library(
         native-lib
@@ -52,10 +52,10 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
 
-set(ASSIMP_INCLUDE_DIR src/main/jni/external/assimp/include)
+set(ASSIMP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src/main/jni/external/assimp/include)
 include_directories(${ASSIMP_INCLUDE_DIR})
 
 target_link_libraries(
         native-lib
-        /home/peto/git/AGReality/app/src/main/jniLibs/armeabi-v7a/libassimp.so
+        ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${CMAKE_ANDROID_ARCH_ABI}/libassimp.so
 )

@@ -46,6 +46,12 @@ Java_com_example_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
 
 	check_gl_error("unknown");
 
+	AGR_INFO("GL_VENDOR: %s", glGetString(GL_VENDOR));
+	AGR_INFO("GL_RENDERER: %s", glGetString(GL_RENDERER));
+	AGR_INFO("GL_VERSION: %s", glGetString(GL_VERSION));
+	AGR_INFO("GL_SHADING_LANGUAGE_VERSION: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	AGR_INFO("GL_EXTENSIONS: %s", glGetString(GL_EXTENSIONS));
+
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -76,12 +82,6 @@ Java_com_example_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
 	check_gl_error("glGetUniformLocation> MMatrix");
 	camera_program.uniform_locations[pmatrix] = glGetUniformLocation(camera_program.id, "PMatrix");
 	check_gl_error("glGetUniformLocation> PMatrix");
-
-	AGR_INFO("GL_VENDOR: %s", glGetString(GL_VENDOR));
-	AGR_INFO("GL_RENDERER: %s", glGetString(GL_RENDERER));
-	AGR_INFO("GL_VERSION: %s", glGetString(GL_VERSION));
-	AGR_INFO("GL_SHADING_LANGUAGE_VERSION: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
-	AGR_INFO("GL_EXTENSIONS: %s", glGetString(GL_EXTENSIONS));
 }
 
 JNIEXPORT void JNICALL

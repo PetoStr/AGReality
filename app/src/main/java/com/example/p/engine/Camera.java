@@ -22,7 +22,6 @@ public class Camera implements Movable {
 	public float[] getViewMatrix() {
 		float[] viewMatrix = new float[16];
 
-		DeviceMovement.INSTANCE.updateOrientationAndAccel();
 		float[] orientation = DeviceMovement.INSTANCE.getOrientationAngles();
 
 		float x = (float) (position.x + Math.sin(-orientation[0]) * Math.cos(-orientation[1]));

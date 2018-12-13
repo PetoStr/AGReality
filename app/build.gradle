@@ -9,12 +9,6 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        externalNativeBuild {
-            cmake {
-                cppFlags ""
-                arguments "-DANDROID_ABI=armeabi-v7a"
-            }
-        }
     }
 
     buildTypes {
@@ -22,13 +16,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             ndk {
-                abiFilters 'armeabi-v7a'
+                abiFilters "armeabi-v7a", "arm64-v8a"
             }
         }
 
         debug {
             ndk {
-                abiFilters 'armeabi-v7a'
+                abiFilters "armeabi-v7a", "arm64-v8a"
             }
         }
     }
@@ -42,7 +36,7 @@ android {
     splits {
         density {
             reset()
-            include "armeabi-v7a"
+            include "armeabi-v7a", "arm64-v8a"
         }
     }
     compileOptions {

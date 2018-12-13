@@ -17,8 +17,25 @@ void shader_program_unbind(void)
 	glUseProgram(0);
 }
 
+static void print_shader_info(struct shader_info *shdr)
+{
+	GLint len = 0;
+	glGetShaderiv(shdr->id, GL_INFO_LOG_LENGTH, &len);
+	GLchar m[len];
+	glGetShaderInfoLog(shdr->id, len, &len, m);
+	AGR_ERROR("%s compilation failed: %s\n", shdr->file_name, m);
+}
 
-void create_shader(struct shader_info *shdr, GLenum type)
+static void print_program_info(GLint pid)
+{
+	GLint len = 0;
+	glGetProgramiv(pid, GL_INFO_LOG_LENGTH, &len);
+	GLchar m[len];
+	glGetProgramInfoLog(pid, len, &len, m);
+	AGR_ERROR("%s\n", m);
+}
+
+static void create_shader(struct shader_info *shdr, GLenum type)
 {
 	shdr->id = glCreateShader(type);
 
@@ -31,17 +48,13 @@ void create_shader(struct shader_info *shdr, GLenum type)
 	glGetShaderiv(shdr->id, GL_COMPILE_STATUS, &compiled);
 
 	if (compiled == GL_FALSE) {
-		GLint len = 0;
-		glGetShaderiv(shdr->id, GL_INFO_LOG_LENGTH, &len);
-		GLchar m[len];
-		glGetShaderInfoLog(shdr->id, len, &len, m);
-		AGR_ERROR("%s compilation failed: %s\n", shdr->file_name, m);
+		print_shader_info(shdr);
 	}
 
 	free(src);
 }
 
-void link_shaders(GLint p, GLint vs, GLint fs)
+static void link_shaders(GLint p, GLint vs, GLint fs)
 {
 	glAttachShader(p, vs);
 	glAttachShader(p, fs);
@@ -50,11 +63,7 @@ void link_shaders(GLint p, GLint vs, GLint fs)
 	GLint status = GL_FALSE;
 	glGetProgramiv(p, GL_LINK_STATUS, &status);
 	if (status == GL_FALSE) {
-		GLint len = 0;
-		glGetProgramiv(p, GL_INFO_LOG_LENGTH, &len);
-		GLchar m[len];
-		glGetProgramInfoLog(p, len, &len, m);
-		AGR_ERROR("%s\n", m);
+		print_program_info(p);
 	}
 
 	glValidateProgram(p);
@@ -74,7 +83,7 @@ void link_shaders(GLint p, GLint vs, GLint fs)
 	check_gl_error("glDeleteShader");
 }
 
-void bind_attrib_locations(GLint program_id)
+static void bind_attrib_locations(GLint program_id)
 {
 	glBindAttribLocation(program_id, 0, "in_pos");
 	check_gl_error("glBindAttribLocation");
@@ -102,4 +111,3 @@ void delete_program(struct program_info *p)
 	glDeleteProgram(p->id);
 	check_gl_error("glDeleteProgram");
 }
-

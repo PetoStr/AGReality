@@ -27,15 +27,16 @@ import java.util.Arrays;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class Camera2Manager implements ActivityCompat.OnRequestPermissionsResultCallback, SurfaceTexture.OnFrameAvailableListener, Hardware {
+public enum Camera2Manager implements ActivityCompat.OnRequestPermissionsResultCallback,
+		SurfaceTexture.OnFrameAvailableListener, Hardware {
 
-	public static final Camera2Manager INSTANCE = new Camera2Manager();
+	INSTANCE;
 
 	private static final String TAG = Camera2Manager.class.getName();
 
 	private String cameraId;
 
-	private Context context;
+	private static Context context;
 
 	private Size previewSize;
 
@@ -66,9 +67,6 @@ public class Camera2Manager implements ActivityCompat.OnRequestPermissionsResult
 		ORIENTATIONS.append(Surface.ROTATION_90, 180);
 		ORIENTATIONS.append(Surface.ROTATION_180, 270);
 		ORIENTATIONS.append(Surface.ROTATION_270, 0);
-	}
-
-	public Camera2Manager() {
 		context = MainActivity.INSTANCE.getApplicationContext();
 	}
 
@@ -79,7 +77,7 @@ public class Camera2Manager implements ActivityCompat.OnRequestPermissionsResult
 	@Override
 	public void start() {
 		startCameraThread();
-		if (surfaceTexture != null) {
+		if (surfaceTexture != null && captureSession == null) {
 			openCamera();
 			surfaceTexture.setOnFrameAvailableListener(this, cameraHandler);
 		}

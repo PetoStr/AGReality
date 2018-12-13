@@ -1,56 +1,74 @@
 package com.example.p.engine.hardware;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 import com.example.p.engine.MainActivity;
 
-public class DeviceMovement implements SensorEventListener, Hardware {
+public enum DeviceMovement implements SensorEventListener, Hardware {
 
-	public static final DeviceMovement INSTANCE = new DeviceMovement();
+	INSTANCE;
 
 	private static final float ALPHA = 0.05f;
 
 	private SensorManager sensorManager;
 
+	private boolean isListening;
+
 	private Sensor accelerometer;
 	private Sensor magnetometer;
-	private Sensor gravitySensor;
+	private Sensor gyroscope;
+
+	private boolean hasGyro;
 
 	private float[] accelerometerData = new float[3];
 	private float[] magnetometerData = new float[3];
-	private float[] gravityData = new float[3];
+	private float[] rotationData = new float[5];
 	private boolean hasAccelerometerData;
 	private boolean hasMagnetoMeterData;
+	private boolean hasRotationData;
 
 	private float[] accelStorage = new float[3];
 
-	private final float[] rotationMatrix = new float[9];
 	private final float[] orientationAngles = new float[3];
 
 	float[] earthAcceleration = new float[16];
 
-	private DeviceMovement() {
+	DeviceMovement() {
 		Context context = MainActivity.INSTANCE.getApplicationContext();
 		sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-		gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+		gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+
+		hasGyro = context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_GYROSCOPE);
+		Log.i("gyro", "hasGyro = " + hasGyro);
 	}
 
 	@Override
 	public void start() {
-		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
-		sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
-		//sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_GAME);
+		if (!isListening) {
+			if (hasGyro) {
+				sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_GAME);
+			} else {
+				sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+				sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
+			}
+			isListening = true;
+		}
 	}
 
 	@Override
 	public void stop() {
-		sensorManager.unregisterListener(this);
+		if (isListening) {
+			sensorManager.unregisterListener(this);
+			isListening = false;
+		}
 	}
 
 	private float[] lowPass(float[] input, float[] output) {
@@ -62,34 +80,26 @@ public class DeviceMovement implements SensorEventListener, Hardware {
 		return output;
 	}
 
-	private float[] filterData(float[] output, float[] data, float filteringFactor) {
-		for (int i = 0; i < data.length; i++) {
-			accelStorage[i] = data[i] * filteringFactor + accelStorage[i] * (1.0f - filteringFactor);
-			output[i] = data[i] - accelStorage[i];
-		}
-
-		return output;
-	}
-
 	@Override
 	public void onSensorChanged(SensorEvent sensorEvent) {
 		int sensorType = sensorEvent.sensor.getType();
 
 		switch (sensorType) {
+			case Sensor.TYPE_ROTATION_VECTOR:
+				rotationData = sensorEvent.values.clone();
+				hasRotationData = true;
+				break;
 			case Sensor.TYPE_ACCELEROMETER:
-				//filterData(accelerometerData, sensorEvent.values, 0.1f);
 				accelerometerData = lowPass(sensorEvent.values.clone(), accelerometerData);
 				hasAccelerometerData = true;
 				break;
 			case Sensor.TYPE_MAGNETIC_FIELD:
-				//exponentialSmoothing(sensorEvent.values, magnetometerData, 0.5f);
 				magnetometerData = lowPass(sensorEvent.values.clone(), magnetometerData);
 				hasMagnetoMeterData = true;
 				break;
-			case Sensor.TYPE_GRAVITY:
-				System.arraycopy(sensorEvent.values, 0, gravityData, 0, gravityData.length);
-				break;
 		}
+
+		updateOrientationAndAccel();
 	}
 
 	@Override
@@ -118,33 +128,22 @@ public class DeviceMovement implements SensorEventListener, Hardware {
 		return ret;
 	}
 
-	public static float[] adjustAccelOrientation(int displayRotation, float[] eventValues) {
-		float[] adjustedValues = new float[3];
-
-		final int axisSwap[][] = {
-				{ 1, -1, 0, 1 },     // ROTATION_0
-				{ -1, -1, 1, 0 },     // ROTATION_90
-				{ -1, 1, 0, 1 },     // ROTATION_180
-				{ 1, 1, 1, 0 } }; // ROTATION_270
-
-		final int[] as = axisSwap[displayRotation];
-		adjustedValues[0] = (float) as[0] * eventValues[as[2]];
-		adjustedValues[1] = (float) as[1] * eventValues[as[3]];
-		adjustedValues[2] = eventValues[2];
-
-		return adjustedValues;
-	}
-
 	public void updateOrientationAndAccel() {
-		if (!hasMagnetoMeterData || !hasAccelerometerData) {
-			return;
-		}
-		hasMagnetoMeterData = false;
-		hasAccelerometerData = false;
-		boolean res = SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerData,
-				magnetometerData);
-		if (!res) {
-			System.err.println("failed");
+		float[] rotationMatrix = new float[9];
+
+		if (hasRotationData) {
+			SensorManager.getRotationMatrixFromVector(rotationMatrix, rotationData);
+			hasRotationData = false;
+		} else if (hasMagnetoMeterData && hasAccelerometerData) {
+			boolean res = SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerData,
+					magnetometerData);
+			if (!res) {
+				System.err.println("failed");
+				return;
+			}
+			hasMagnetoMeterData = false;
+			hasAccelerometerData = false;
+		} else {
 			return;
 		}
 
