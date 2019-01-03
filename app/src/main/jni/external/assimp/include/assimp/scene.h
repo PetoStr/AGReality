@@ -290,12 +290,12 @@ struct aiScene
     */
     C_STRUCT aiAnimation** mAnimations;
 
-    /** The number of textures embedded into the file */
+    /** The number of texts embedded into the file */
     unsigned int mNumTextures;
 
-    /** The array of embedded textures.
+    /** The array of embedded texts.
     *
-    * Not many file formats embed their textures into the file.
+    * Not many file formats embed their texts into the file.
     * An example is Quake's MDL format (which is also used by
     * some GameStudio versions)
     */
@@ -362,7 +362,7 @@ struct aiScene
         return mLights != NULL && mNumLights > 0;
     }
 
-    //! Check whether the scene contains textures
+    //! Check whether the scene contains texts
     inline bool HasTextures() const {
         return mTextures != NULL && mNumTextures > 0;
     }

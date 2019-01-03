@@ -1,89 +1,101 @@
-#include <assert.h>
 #include "mesh.h"
+
+#include <assert.h>
+#include <stdlib.h>
 
 #include "texture.h"
 #include "util.h"
 
 void create_vertices_buffer(struct mesh_info *mesh,
-			    float *pos, size_t pos_size,
-			    float *norms, size_t norm_size,
-			    float *tc, size_t tc_size,
-			    unsigned int *ind, size_t ind_size)
+			    const float *pos, size_t pos_size,
+			    const float *norms, size_t norm_size,
+			    const float *tc, size_t tc_size,
+			    const float *tangents, size_t tangents_size,
+			    const unsigned int *ind, size_t ind_size)
 {
 	glGenVertexArrays(1, &mesh->vao);
 	glBindVertexArray(mesh->vao);
 
-	mesh->vbos_len = 0;
+	mesh->nvbos = 0;
 
 	if (pos) {
-		glGenBuffers(1, &mesh->vbos[mesh->vbos_len]);
-		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[mesh->vbos_len]);
+		glGenBuffers(1, &mesh->vbos[mesh->nvbos]);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[mesh->nvbos]);
 		glBufferData(GL_ARRAY_BUFFER, pos_size, pos, GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		mesh->vbos_len++;
+		mesh->nvbos++;
 	}
 
 	if (norms) {
-		glGenBuffers(1, &mesh->vbos[mesh->vbos_len]);
-		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[mesh->vbos_len]);
+		glGenBuffers(1, &mesh->vbos[mesh->nvbos]);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[mesh->nvbos]);
 		glBufferData(GL_ARRAY_BUFFER, norm_size, norms, GL_STATIC_DRAW);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		mesh->vbos_len++;
+		mesh->nvbos++;
 	}
 
 	if (tc) {
-		glGenBuffers(1, &mesh->vbos[mesh->vbos_len]);
-		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[mesh->vbos_len]);
+		glGenBuffers(1, &mesh->vbos[mesh->nvbos]);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[mesh->nvbos]);
 		glBufferData(GL_ARRAY_BUFFER, tc_size, tc, GL_STATIC_DRAW);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-		mesh->vbos_len++;
+		mesh->nvbos++;
+	}
+
+	if (tangents) {
+		glGenBuffers(1, &mesh->vbos[mesh->nvbos]);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[mesh->nvbos]);
+		glBufferData(GL_ARRAY_BUFFER, tangents_size, tangents, GL_STATIC_DRAW);
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		mesh->nvbos++;
 	}
 
 	assert(ind != NULL);
-	glGenBuffers(1, &mesh->vbos[mesh->vbos_len]);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->vbos[mesh->vbos_len]);
+	glGenBuffers(1, &mesh->vbos[mesh->nvbos]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->vbos[mesh->nvbos]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind_size, ind, GL_STATIC_DRAW);
-	mesh->vbos_len++;
+	mesh->nvbos++;
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	mesh->vert_count = ind_size / sizeof(*ind);
+	mesh->vert_count = (GLsizei) ind_size / sizeof(*ind);
 }
 
-static inline void begin_mesh_render(GLint program_id, struct mesh_info *mesh)
+static inline void begin_mesh_render(GLuint program_id, const struct mesh_info *mesh)
 {
 	int n;
-	for (n = 0; n < mesh->num_textures; n++) {
-		struct texture_info *texture = &mesh->textures[n];
+	for (n = 0; n < mesh->ntexts; n++) {
+		struct texture_info *texture = &mesh->texts[n];
 
-		glActiveTexture(GL_TEXTURE0 + n);
+		/* leave TEXTURE0 as default black texture */
+		glActiveTexture(GL_TEXTURE0 + n + 1);
 
 		GLint sampler = glGetUniformLocation(program_id, texture->type);
-		glUniform1i(sampler, n);
+		glUniform1i(sampler, n + 1);
 
 		glBindTexture(texture->target, texture->id);
 	}
 
 	glBindVertexArray(mesh->vao);
-	for (n = 0; n < mesh->vbos_len; n++) {
+	for (n = 0; n < mesh->nvbos; n++) {
 		glEnableVertexAttribArray(n);
 	}
 }
 
-static inline void end_mesh_render(struct mesh_info *mesh) {
+static inline void end_mesh_render(const struct mesh_info *mesh) {
 	int n;
-	for (n = 0; n < mesh->vbos_len; n++) {
+	for (n = 0; n < mesh->nvbos; n++) {
 		glDisableVertexAttribArray(n);
 	}
 	glBindVertexArray(0);
 
-	if (mesh->num_textures > 0) {
-		glBindTexture(mesh->textures[0].target, 0);
+	if (mesh->ntexts > 0) {
+		glBindTexture(mesh->texts[0].target, 0);
 	}
 }
 
-void render_mesh(GLint program_id, struct mesh_info *mesh)
+void render_mesh(GLuint program_id, const struct mesh_info *mesh)
 {
 	begin_mesh_render(program_id, mesh);
 
@@ -104,12 +116,12 @@ void delete_vertices_buffer(struct mesh_info *mesh)
 	glDeleteVertexArrays(1, &mesh->vao);
 }
 
-void delete_mesh(struct mesh_info *mesh)
+void free_mesh(struct mesh_info *mesh)
 {
 	int n;
-	for (n = 0; n < mesh->num_textures; n++) {
-		delete_texture(&mesh->textures[n]);
+	for (n = 0; n < mesh->ntexts; n++) {
+		free_texture(&mesh->texts[n]);
 	}
-	free(mesh->textures);
+	free(mesh->texts);
 }
 

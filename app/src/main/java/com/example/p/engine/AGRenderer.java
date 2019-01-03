@@ -3,9 +3,8 @@ package com.example.p.engine;
 import android.content.res.AssetManager;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
-import android.util.Size;
 
-import com.example.p.agreality.MainLogic;
+import com.example.p.agreality.AGLogic;
 import com.example.p.agreality.SimpleLogic;
 import com.example.p.engine.hardware.Camera2Manager;
 
@@ -23,27 +22,27 @@ public class AGRenderer implements GLSurfaceView.Renderer, GLSurfaceView.EGLCont
 
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-		Camera.getInstance().reset();
-
 		Camera2Manager.INSTANCE.createSurfaceTexture(create_oes_texture());
 
-		init(MainActivity.INSTANCE.getAssets());
+		init(App.getContext().getAssets());
 
-		agReality = new MainLogic(this);
+		agReality = new AGLogic();
 		agReality.init();
 	}
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		agReality.loop();
+		agReality.draw(this);
 	}
 
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		surface_changed(width, height);
+		Screen.setWidth(width);
+		Screen.setHeight(height);
 	}
 
-	private int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
+	private static final int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
 
 	@Override
 	public EGLContext createContext(EGL10 egl, EGLDisplay display, EGLConfig config) {
@@ -57,21 +56,15 @@ public class AGRenderer implements GLSurfaceView.Renderer, GLSurfaceView.EGLCont
 	public void destroyContext(EGL10 egl, EGLDisplay display,
 							   EGLContext context) {
 		on_destroy();
+		Camera2Manager.INSTANCE.eglContextDestroyed();
 		if (!egl.eglDestroyContext(display, context)) {
 			Log.e(TAG, "display:" + display + " context: " + context);
 		}
 	}
 
-	public void drawCamera() {
-		if (Camera2Manager.INSTANCE.isAvailable()) {
-			Camera2Manager.INSTANCE.update();
-			int dispRotation = MainActivity.INSTANCE
-					.getWindowManager().getDefaultDisplay().getRotation();
-			float rotation = (float) Math.toRadians(Camera2Manager.INSTANCE.getOrientation(dispRotation));
-
-			Size size = Camera2Manager.INSTANCE.getPreviewSize();
-
-			draw_camera(rotation, size.getWidth(), size.getHeight());
+	public void onTouch(int pointerId, float x, float y, int action) {
+		if (agReality != null) {
+			agReality.onTouch(pointerId, x, Screen.getHeight() - y, action);
 		}
 	}
 
@@ -83,7 +76,9 @@ public class AGRenderer implements GLSurfaceView.Renderer, GLSurfaceView.EGLCont
 
 	public native void draw(Scene scene);
 
-	private native void draw_camera(float rotation, int width, int height);
+	public native void draw_camera(float rotation, int width, int height);
+
+	public native void draw_text(String text, float x, float y, float scale, float[] color);
 
 	private native int create_oes_texture();
 

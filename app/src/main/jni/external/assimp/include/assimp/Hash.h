@@ -79,7 +79,7 @@ int rem;
     rem = len & 3;
     len >>= 2;
 
-    /* Main loop */
+    /* Main tick */
     for (;len > 0; len--) {
         hash  += get16bits (data);
         tmp    = (get16bits (data+2) << 11) ^ hash;

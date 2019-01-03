@@ -477,7 +477,7 @@ struct aiMemoryInfo
 
     /** Default constructor */
     aiMemoryInfo() AI_NO_EXCEPT
-        : textures   (0)
+        : texts   (0)
         , materials  (0)
         , meshes     (0)
         , nodes      (0)

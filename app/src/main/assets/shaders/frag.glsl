@@ -2,16 +2,24 @@
 
 precision mediump float;
 
-uniform bool has_texture;
-
-uniform sampler2D texture_diffuse;
-uniform sampler2D texture_specular;
-
 in vec2 f_uv;
 in vec3 f_norm;
 in vec3 f_pos;
+in mat3 f_TBN;
 
 out vec4 out_color;
+
+uniform bool has_texture;
+uniform bool selected;
+uniform bool has_nmap;
+uniform bool has_smap;
+
+uniform vec3 view_pos;
+uniform vec3 dlight_dir;
+
+uniform sampler2D texture_diffuse;
+uniform sampler2D texture_specular;
+uniform sampler2D texture_normals;
 
 struct dir_light {
 	vec3 direction;
@@ -19,43 +27,52 @@ struct dir_light {
 	float intensity;
 };
 
-vec4 calc_light_color(dir_light light, vec3 normal, vec4 dc, vec4 sc, vec3 pos)
+float ambient_intensity = 0.5;
+
+vec4 calc_light_color(vec3 light_dir, vec3 norm, vec3 dc, vec3 sc, vec3 pos)
 {
-	normal = normalize(normal);
-	light.direction = normalize(-light.direction);
+	vec3 ambient = ambient_intensity * dc;
 
-	vec4 ambient_color = vec4(light.color * vec3(0.1, 0.1, 0.1), 1.0);
+	float diff = max(dot(norm, light_dir), 0.0);
+	vec3 diffuse = 0.1 * diff * dc;
 
-	float diffuse_factor = max(dot(normal, light.direction), 0.0);
-	vec4 diffuse_color = vec4(light.color, 1.0) * (diffuse_factor * dc);
+	vec3 view_dir = normalize(view_pos - pos);
+	vec3 reflect_dir = reflect(-light_dir, norm);
+	float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 8.0);
+	vec3 specular = 0.1 * spec * sc;
 
-	vec3 cam_dir = normalize(-pos);
-	vec3 reflected_light = normalize(reflect(light.direction, normal));
-	float specular_factor = max(dot(cam_dir, reflected_light), 0.0);
-	specular_factor = pow(specular_factor, 32.0);
-	//vec4 specular_color = sc * light.intensity * specular_factor * 4.0 * vec4(light.color, 1.0);
-	vec4 specular_color = vec4(light.color, 1.0) * (sc * specular_factor);
-
-	return ambient_color + diffuse_color + specular_color;
+	return vec4(ambient + diffuse + specular, 1.0);
 }
 
 void main(void)
 {
-	vec4 color;
-	if (has_texture) {
-		vec4 dc = texture(texture_diffuse, f_uv);
-		vec4 sc = texture(texture_specular, f_uv);
-
-		dir_light dlight;
-		dlight.direction = vec3(0.0, 1.0, -1.0);
-		dlight.color = vec3(1.0);
-		dlight.intensity = 0.3;
-
-		//color = calc_light_color(dlight, norm, dc, sc, vpos);
-		color = dc - vec4(0.15) + sc;
-	} else {
-		color = vec4(0.7, 0.7, 0.7, 1.0);
+	if (selected) {
+		ambient_intensity = 0.7;
 	}
 
-	out_color = vec4(color.rgb, 0.7);
+	vec4 color;
+	vec4 dc;
+	vec4 sc;
+	if (has_texture) {
+		dc = texture(texture_diffuse, f_uv);
+	} else {
+		dc = vec4(0.1, 0.1, 0.1, 1.0);
+	}
+
+	if (has_smap) {
+		sc = texture(texture_specular, f_uv);
+	} else {
+		sc = vec4(0.0, 0.0, 0.0, 1.0);
+	}
+
+	vec3 norm;
+	if (has_nmap) {
+		norm = texture(texture_normals, f_uv).rgb;
+		norm = normalize(norm * 2.0 - 1.0);
+		norm = normalize(f_TBN * norm);
+	} else {
+		norm = f_norm;
+	}
+
+	out_color = calc_light_color(dlight_dir, norm, dc.rgb, sc.rgb, f_pos);
 }

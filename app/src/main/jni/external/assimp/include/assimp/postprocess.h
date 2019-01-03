@@ -127,7 +127,7 @@ enum aiPostProcessSteps
 
     // -------------------------------------------------------------------------
     /** <hr>Removes some parts of the data structure (animations, materials,
-     *  light sources, cameras, textures, vertex components).
+     *  light sources, cameras, texts, vertex components).
      *
      * The  components to be removed are specified in a separate
      * importer property, <tt>#AI_CONFIG_PP_RVC_FLAGS</tt>. This is quite useful
@@ -155,7 +155,7 @@ enum aiPostProcessSteps
     /** <hr>Generates normals for all faces of all meshes.
      *
      * This is ignored if normals are already there at the time this flag
-     * is evaluated. Model importers try to load them from the source file, so
+     * is evaluated. Resource importers try to load them from the source file, so
      * they're usually already there. Face normals are shared between all points
      * of a single face, so a single point can have multiple normals, which
      * forces the library to duplicate vertices in some cases.
@@ -169,7 +169,7 @@ enum aiPostProcessSteps
     /** <hr>Generates smooth normals for all vertices in the mesh.
     *
     * This is ignored if normals are already there at the time this flag
-    * is evaluated. Model importers try to load them from the source file, so
+    * is evaluated. Resource importers try to load them from the source file, so
     * they're usually already there.
     *
     * This flag may not be specified together with
@@ -411,7 +411,7 @@ enum aiPostProcessSteps
      *
      * UV transformations are specified per-texture - see the
      * <tt>#AI_MATKEY_UVTRANSFORM</tt> material key for more information.
-     * This step processes all textures with
+     * This step processes all texts with
      * transformed input UV coordinates and generates a new (pre-transformed) UV channel
      * which replaces the old channel. Most applications won't support UV
      * transformations, so you will probably want to specify this step.
@@ -546,9 +546,9 @@ enum aiPostProcessSteps
     aiProcess_GlobalScale = 0x8000000,
 
     // -------------------------------------------------------------------------
-    /** <hr>A postprocessing step to embed of textures.
+    /** <hr>A postprocessing step to embed of texts.
      *
-     *  This will remove external data dependencies for textures.
+     *  This will remove external data dependencies for texts.
      *  If a texture's file does not exist at the specified path
      *  (due, for instance, to an absolute path generated on another system),
      *  it will check if a file with the same name exists at the root folder

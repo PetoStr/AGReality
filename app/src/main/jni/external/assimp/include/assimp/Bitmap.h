@@ -42,9 +42,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /** @file Bitmap.h
- *  @brief Defines bitmap format helper for textures
+ *  @brief Defines bitmap format helper for texts
  *
- * Used for file formats which embed their textures into the model file.
+ * Used for file formats which embed their texts into the model file.
  */
 
 #ifndef AI_BITMAP_H_INC

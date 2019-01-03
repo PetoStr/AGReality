@@ -14,7 +14,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar.Fullscreen" >
+        android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar.Fullscreen"
+        android:largeHeap="true"
+        android:name="com.example.p.engine.App" >
         <activity android:name="com.example.p.engine.MainActivity" android:configChanges="orientation|keyboard|keyboardHidden|screenLayout|uiMode|screenSize|smallestScreenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -8,9 +8,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
+import com.example.p.engine.App;
 import com.example.p.engine.MainActivity;
 
-public enum DeviceMovement implements SensorEventListener, Hardware {
+public enum DeviceMovement implements SensorEventListener, AGSensor {
 
 	INSTANCE;
 
@@ -23,6 +24,7 @@ public enum DeviceMovement implements SensorEventListener, Hardware {
 	private Sensor accelerometer;
 	private Sensor magnetometer;
 	private Sensor gyroscope;
+	private Sensor linAccel;
 
 	private boolean hasGyro;
 
@@ -40,19 +42,20 @@ public enum DeviceMovement implements SensorEventListener, Hardware {
 	float[] earthAcceleration = new float[16];
 
 	DeviceMovement() {
-		Context context = MainActivity.INSTANCE.getApplicationContext();
-		sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+		sensorManager = (SensorManager) App.getContext().getSystemService(Context.SENSOR_SERVICE);
 		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 		gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+		linAccel = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
 
-		hasGyro = context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_GYROSCOPE);
+		hasGyro = App.getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_GYROSCOPE);
 		Log.i("gyro", "hasGyro = " + hasGyro);
 	}
 
 	@Override
 	public void start() {
 		if (!isListening) {
+			sensorManager.registerListener(this, linAccel, SensorManager.SENSOR_DELAY_GAME);
 			if (hasGyro) {
 				sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_GAME);
 			} else {
@@ -71,11 +74,11 @@ public enum DeviceMovement implements SensorEventListener, Hardware {
 		}
 	}
 
-	private float[] lowPass(float[] input, float[] output) {
+	private float[] lowPass(float[] input, float[] output, float alpha) {
 		if (output == null) return input;
 
 		for (int i = 0; i < input.length; i++) {
-			output[i] = output[i] + ALPHA * (input[i] - output[i]);
+			output[i] = output[i] + alpha * (input[i] - output[i]);
 		}
 		return output;
 	}
@@ -90,12 +93,15 @@ public enum DeviceMovement implements SensorEventListener, Hardware {
 				hasRotationData = true;
 				break;
 			case Sensor.TYPE_ACCELEROMETER:
-				accelerometerData = lowPass(sensorEvent.values.clone(), accelerometerData);
+				accelerometerData = lowPass(sensorEvent.values.clone(), accelerometerData, ALPHA);
 				hasAccelerometerData = true;
 				break;
 			case Sensor.TYPE_MAGNETIC_FIELD:
-				magnetometerData = lowPass(sensorEvent.values.clone(), magnetometerData);
+				magnetometerData = lowPass(sensorEvent.values.clone(), magnetometerData, ALPHA);
 				hasMagnetoMeterData = true;
+				break;
+			case Sensor.TYPE_LINEAR_ACCELERATION:
+				earthAcceleration = lowPass(sensorEvent.values.clone(), earthAcceleration, ALPHA);
 				break;
 		}
 
@@ -113,19 +119,6 @@ public enum DeviceMovement implements SensorEventListener, Hardware {
 
 	public float[] getEarthAcceleration() {
 		return earthAcceleration;
-	}
-
-	private float[] average(float[][] data) {
-		int dataLen = data.length;
-		int n = data[0].length;
-
-		float[] ret = new float[n];
-
-		for (int i = 0; i < n; i++) {
-			ret[i] = dataLen / 2 * (data[0][i] + data[dataLen - 1][i]) / dataLen;
-		}
-
-		return ret;
 	}
 
 	public void updateOrientationAndAccel() {

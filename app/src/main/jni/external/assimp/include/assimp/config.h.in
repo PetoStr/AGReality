@@ -139,10 +139,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // ---------------------------------------------------------------------------
-/** @brief  Specifies the maximum angle that may be between two vertex tangents
+/** @brief  Specifies the maximum rotation that may be between two vertex tangents
  *         that their tangents and bi-tangents are smoothed.
  *
- * This applies to the CalcTangentSpace-Step. The angle is specified
+ * This applies to the CalcTangentSpace-Step. The rotation is specified
  * in degrees. The maximum value is 175.
  * Property type: float. Default value: 45 degrees
  */
@@ -160,11 +160,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     "PP_CT_TEXTURE_CHANNEL_INDEX"
 
 // ---------------------------------------------------------------------------
-/** @brief  Specifies the maximum angle that may be between two face normals
+/** @brief  Specifies the maximum rotation that may be between two face normals
  *          at the same vertex position that their are smoothed together.
  *
- * Sometimes referred to as 'crease angle'.
- * This applies to the GenSmoothNormals-Step. The angle is specified
+ * Sometimes referred to as 'crease rotation'.
+ * This applies to the GenSmoothNormals-Step. The rotation is specified
  * in degrees, so 180 is PI. The default value is 175 degrees (all vertex
  * normals are smoothed). The maximum value is 175, too. Property type: float.
  * Warning: setting this option may cause a severe loss of performance. The
@@ -177,7 +177,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 /** @brief Sets the colormap (= palette) to be used to decode embedded
- *         textures in MDL (Quake or 3DGS) files.
+ *         texts in MDL (Quake or 3DGS) files.
  *
  * This must be a valid path to a file. The file is 768 (256*3) bytes
  * large and contains RGB triplets for each of the 256 palette entries.
@@ -425,7 +425,7 @@ enum aiComponent
      * use the #aiProcess_OptimizeGraph step to do this */
     aiComponent_ANIMATIONS = 0x40,
 
-    /** Removes all embedded textures (aiScene::mTextures) */
+    /** Removes all embedded texts (aiScene::mTextures) */
     aiComponent_TEXTURES = 0x80,
 
     /** Removes all light sources (aiScene::mLights).
@@ -573,7 +573,7 @@ enum aiComponent
     "IMPORT_FBX_READ_MATERIALS"
 
 // ---------------------------------------------------------------------------
-/** @brief Set whether the fbx importer will read embedded textures.
+/** @brief Set whether the fbx importer will read embedded texts.
  *
  * The default value is true (1)
  * Property type: bool
@@ -709,7 +709,7 @@ enum aiComponent
  *
  * UV coordinates for terrains are so simple to compute that you'll usually
  * want to compute them on your own, if you need them. This option is intended
- * for model viewers which want to offer an easy way to apply textures to
+ * for resource viewers which want to offer an easy way to apply texts to
  * terrains.
  * * Property type: bool. Default value: false.
  */
@@ -755,13 +755,13 @@ enum aiComponent
  *  MD3 file. This can also be a search path.
  *
  * By default Assimp's behaviour is as follows: If a MD3 file
- * <tt>any_path/models/any_q3_subdir/model_name/file_name.md3</tt> is
+ * <tt>any_path/models/any_q3_subdir/model_name/fname.md3</tt> is
  * loaded, the library tries to locate the corresponding shader file in
  * <tt>any_path/scripts/model_name.shader</tt>. This property overrides this
  * behaviour. It can either specify a full path to the shader to be loaded
  * or alternatively the path (relative or absolute) to the directory where
  * the shaders for all MD3s to be loaded reside. Assimp attempts to open
- * <tt>IMPORT_MD3_SHADER_SRC/model_name.shader</tt> first, <tt>IMPORT_MD3_SHADER_SRC/file_name.shader</tt>
+ * <tt>IMPORT_MD3_SHADER_SRC/model_name.shader</tt> first, <tt>IMPORT_MD3_SHADER_SRC/fname.shader</tt>
  * is the fallback file. Note that IMPORT_MD3_SHADER_SRC should have a terminal (back)slash.
  * Property type: String. Default value: n/a.
  */
@@ -769,12 +769,12 @@ enum aiComponent
     "IMPORT_MD3_SHADER_SRC"
 
 // ---------------------------------------------------------------------------
-/** @brief  Configures the LWO loader to load just one layer from the model.
+/** @brief  Configures the LWO loader to load just one layer from the resource.
  *
  * LWO files consist of layers and in some cases it could be useful to load
  * only one of them. This property can be either a string - which specifies
  * the name of the layer - or an integer - the index of the layer. If the
- * property is not set the whole LWO model is loaded. Loading fails if the
+ * property is not set the whole LWO resource is loaded. Loading fails if the
  * requested layer is not available. The layer index is zero-based and the
  * layer name may not be empty.<br>
  * Property type: Integer. Default value: all layers are loaded.
@@ -844,9 +844,9 @@ enum aiComponent
 // ---------------------------------------------------------------------------
 /** @brief Ogre Importer detect the texture usage from its filename.
  *
- * Ogre material texture units do not define texture type, the textures usage
+ * Ogre material texture units do not define texture type, the texts usage
  * depends on the used shader or Ogre's fixed pipeline. If this config property
- * is true Assimp will try to detect the type from the textures filename postfix:
+ * is true Assimp will try to detect the type from the texts filename postfix:
  * _n, _nrm, _nrml, _normal, _normals and _normalmap for normal map, _s, _spec,
  * _specular and _specularmap for specular map, _l, _light, _lightmap, _occ
  * and _occlusion for light map, _disp and _displacement for displacement map.
@@ -894,7 +894,7 @@ enum aiComponent
 #define AI_CONFIG_IMPORT_IFC_CUSTOM_TRIANGULATION "IMPORT_IFC_CUSTOM_TRIANGULATION"
 
 // ---------------------------------------------------------------------------
-/** @brief  Set the tessellation conic angle for IFC smoothing curves.
+/** @brief  Set the tessellation conic rotation for IFC smoothing curves.
  *
  * This is used by the IFC importer to determine the tessellation parameter
  * for smoothing curves.

@@ -1,29 +1,40 @@
+
 #include <stdlib.h>
 #include <string.h>
 
-#include <jni.h>
 #include <android/asset_manager_jni.h>
-#include <assert.h>
+#include <jni.h>
 
+#include "agrlog.h"
 #include "assimpio.h"
+#include "img_renderer.h"
+#include "jni_helper.h"
 #include "linmath.h"
 #include "loader.h"
+#include "model.h"
+#include "pv_matrices.h"
 #include "shader_program.h"
+#include "text_renderer.h"
 #include "util.h"
+#include "scene.h"
 
-static struct program_info *program;
+static struct program_info program;
 static struct program_info camera_program;
 
 static int window_width;
 static int window_height;
 
-static mat4x4 projection_matrix;
-static mat4x4 ortho_matrix;
+static const int mmatrix_loc = 0;
+static const int vmatrix_loc = 1;
+static const int pmatrix_loc = 2;
+static const int has_texture_loc = 3;
+static const int selected_loc = 4;
+static const int has_nmap_loc = 5;
+static const int has_smap_loc = 6;
+static const int view_pos_loc = 7;
+static const int dlight_dir_loc = 8;
 
-static int mmatrix = 0;
-static int vmatrix = 1;
-static int pmatrix = 2;
-static int has_texture = 3;
+static float dlight_dir[] = { 0.0f, 0.0f, -1.0f };
 
 static struct mesh_info camera_mesh;
 
@@ -55,33 +66,54 @@ Java_com_example_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glEnable(GL_CULL_FACE);
+	/*glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+	glFrontFace(GL_CW);*/
 
-	program = malloc(sizeof(*program));
+	const int atbs_len = 4;
+	struct shader_attrib atbs[atbs_len] = {
+		{ 0, "in_pos" },
+		{ 1, "in_norm" },
+		{ 2, "in_uv" },
+		{ 3, "in_tang" }
+	};
 
-	strcpy((char *) program->vs.file_name, "shaders/vert.glsl");
-	strcpy((char *) program->fs.file_name, "shaders/frag.glsl");
-	create_program(program);
+	strcpy((char *) program.vs.fname, "shaders/vert.glsl");
+	strcpy((char *) program.fs.fname, "shaders/frag.glsl");
+	create_program(&program, atbs, atbs_len);
 	check_gl_error("create_program");
 
-	program->uniform_locations[mmatrix] = glGetUniformLocation(program->id, "MMatrix");
+	program.uflocs[mmatrix_loc] = glGetUniformLocation(program.id, "MMatrix");
 	check_gl_error("glGetUniformLocation> MMatrix");
-	program->uniform_locations[vmatrix] = glGetUniformLocation(program->id, "VMatrix");
+	program.uflocs[vmatrix_loc] = glGetUniformLocation(program.id, "VMatrix");
 	check_gl_error("glGetUniformLocation> VMatrix");
-	program->uniform_locations[pmatrix] = glGetUniformLocation(program->id, "PMatrix");
+	program.uflocs[pmatrix_loc] = glGetUniformLocation(program.id, "PMatrix");
 	check_gl_error("glGetUniformLocation> PMatrix");
-	program->uniform_locations[has_texture] = glGetUniformLocation(program->id, "has_texture");
+	program.uflocs[has_texture_loc] = glGetUniformLocation(program.id, "has_texture");
 	check_gl_error("glGetUniformLocation> has_texture");
+	program.uflocs[selected_loc] = glGetUniformLocation(program.id, "selected");
+	check_gl_error("glGetUniformLocation> selected");
+	program.uflocs[has_nmap_loc] = glGetUniformLocation(program.id, "has_nmap");
+	check_gl_error("glGetUniformLocation> has_nmap");
+	program.uflocs[has_smap_loc] = glGetUniformLocation(program.id, "has_smap");
+	check_gl_error("glGetUniformLocation> has_smap_loc");
+	program.uflocs[view_pos_loc] = glGetUniformLocation(program.id, "view_pos");
+	check_gl_error("glGetUniformLocation> view_pos");
+	program.uflocs[dlight_dir_loc] = glGetUniformLocation(program.id, "dlight_dir");
+	check_gl_error("glGetUniformLocation> dlight_dir");
 
-	strcpy((char *) camera_program.vs.file_name, "shaders/camera_vs.glsl");
-	strcpy((char *) camera_program.fs.file_name, "shaders/camera_fs.glsl");
-	create_program(&camera_program);
+	strcpy((char *) camera_program.vs.fname, "shaders/camera_vs.glsl");
+	strcpy((char *) camera_program.fs.fname, "shaders/camera_fs.glsl");
+	create_program(&camera_program, atbs, atbs_len);
 	check_gl_error("create_program");
 
-	camera_program.uniform_locations[mmatrix] = glGetUniformLocation(camera_program.id, "MMatrix");
+	camera_program.uflocs[mmatrix_loc] = glGetUniformLocation(camera_program.id, "MMatrix");
 	check_gl_error("glGetUniformLocation> MMatrix");
-	camera_program.uniform_locations[pmatrix] = glGetUniformLocation(camera_program.id, "PMatrix");
+	camera_program.uflocs[pmatrix_loc] = glGetUniformLocation(camera_program.id, "PMatrix");
 	check_gl_error("glGetUniformLocation> PMatrix");
+
+	text_renderer_init();
+	img_renderer_init();
 }
 
 JNIEXPORT void JNICALL
@@ -91,8 +123,18 @@ Java_com_example_p_engine_AGRenderer_clear(JNIEnv *env, jobject instance)
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_AGRenderer_surface_1changed(JNIEnv *env, jobject instance, jint width,
-						      jint height)
+Java_com_example_p_engine_Scene_set_1dir_1light_1dir(JNIEnv *env, jobject instance,
+						     jfloatArray dir_light_dir_) {
+	jfloat *dir_light_dir = (*env)->GetFloatArrayElements(env, dir_light_dir_, NULL);
+
+	memcpy(dlight_dir, dir_light_dir, sizeof(dlight_dir));
+
+	(*env)->ReleaseFloatArrayElements(env, dir_light_dir_, dir_light_dir, 0);
+}
+
+JNIEXPORT void JNICALL
+Java_com_example_p_engine_AGRenderer_surface_1changed(JNIEnv *env, jobject instance,
+						      jint width, jint height)
 {
 	if (height == 0) {
 		height = 1;
@@ -102,7 +144,7 @@ Java_com_example_p_engine_AGRenderer_surface_1changed(JNIEnv *env, jobject insta
 
 	float ratioW;
 	float ratioH;
-	float ratio = (float) width / (float) height;;
+	float ratio = (float) width / (float) height;
 	if (width > height) {
 		ratioW = (float) width / (float) height;
 		ratioH = 1.0f;
@@ -111,9 +153,10 @@ Java_com_example_p_engine_AGRenderer_surface_1changed(JNIEnv *env, jobject insta
 		ratioH = (float) height / (float) width;
 	}
 
-	mat4x4_perspective(projection_matrix, 0.45f, ratio, 1.0f, 1000.0f);
+	mat4x4_perspective(projection_matrix, M_PI_4, ratio, 1.0f, 1000.0f);
 	//mat4x4_frustum(projection_matrix, -ratioW, ratioW, -ratioH, ratioH, 1.0f, 100.0f);
-	mat4x4_ortho(ortho_matrix, -ratioW, ratioW, -ratioH, ratioH, -1.0f, 1.0f);
+	mat4x4_ortho(ratio_ortho_matrix, -ratioW, ratioW, -ratioH, ratioH, -1.0f, 1.0f);
+	mat4x4_ortho(size_ortho_matrix, 0, width, 0, height, -1.0f, 1.0f);
 
 	window_width = width;
 	window_height = height;
@@ -124,13 +167,11 @@ Java_com_example_p_engine_AGRenderer_on_1destroy(JNIEnv *env,
 						 jobject instance)
 {
 	AGR_INFO("cleaning up");
-	delete_models();
+	free_models();
+	free_imgs();
 
-	delete_texture(&camera_mesh.textures[0]);
-	free(camera_mesh.textures);
-
-	free(program);
-	program = NULL;
+	free_texture(&camera_mesh.texts[0]);
+	free(camera_mesh.texts);
 }
 
 JNIEXPORT jint JNICALL
@@ -158,108 +199,114 @@ Java_com_example_p_engine_AGRenderer_create_1oes_1texture(JNIEnv *env, jobject i
 	create_vertices_buffer(&camera_mesh, coords, sizeof(coords),
 			       NULL, 0,
 			       textureCoords, sizeof(textureCoords),
+			       NULL, 0,
 			       indices, sizeof(indices));
 
-	camera_mesh.textures = malloc(sizeof(*camera_mesh.textures));
-	camera_mesh.num_textures = 1;
+	camera_mesh.texts = malloc(sizeof(*camera_mesh.texts));
+	camera_mesh.ntexts = 1;
 
 	char type[] = "camera";
 
-	camera_mesh.textures[0] = create_oes_texture();
-	camera_mesh.textures[0].type = malloc(sizeof(type));
-	strcpy(camera_mesh.textures[0].type, type);
+	camera_mesh.texts[0] = create_oes_texture();
+	camera_mesh.texts[0].type = malloc(sizeof(type));
+	strcpy(camera_mesh.texts[0].type, type);
 
-	return camera_mesh.textures[0].id;
+	return camera_mesh.texts[0].id;
 }
 
-static jobject scene_get_camera(JNIEnv *env, jobject scene)
+static void draw_imgs(JNIEnv *env, jobject scene)
 {
-	jclass sclass = (*env)->GetObjectClass(env, scene);
+	jsize ientities_len;
+	jobjectArray ientities = jscene_get_ientities(env, scene, &ientities_len);
+	int i;
+	for (i = 0; i < ientities_len; i++) {
+		jobject ientity = (*env)->GetObjectArrayElement(env, ientities, i);
 
-	jmethodID get_camera = (*env)->GetMethodID(env, sclass,
-		"getCamera", "()Lcom/example/p/engine/Camera;");
+		int vis = jentity_is_visible(env, ientity);
+		if (!vis) {
+			continue;
+		}
 
-	return (*env)->CallObjectMethod(env, scene, get_camera);
+		jobject resource = jget_resource(env, ientity);
+		int selected = jentity_is_selected(env, ientity);
+
+		int id = jget_resource_id(env, resource);
+
+		if (id <= -1 || id > imgs_len) {
+			AGR_WARN("resource not loaded, skipping...");
+			return;
+		}
+
+		float mm[16];
+		jentity_model_matrix(env, ientity, mm);
+
+		float opacity = jientity_get_opacity(env, ientity);
+
+		render_img(&imgs[id], mm, opacity, selected);
+	}
 }
 
-static void scene_view_matrix(JNIEnv *env, jobject scene, float vm[16])
-{
-	jobject jcamera = scene_get_camera(env, scene);
-	jclass cclass = (*env)->GetObjectClass(env, jcamera);
-
-	jmethodID get_vm = (*env)->GetMethodID(env, cclass,
-		"getViewMatrix", "()[F");
-
-	jfloatArray j_vmArray = NULL;
-	j_vmArray = (*env)->CallObjectMethod(env, jcamera, get_vm);
-
-	jfloat *j_vm = (*env)->GetFloatArrayElements(env, j_vmArray, NULL);
-
-	memcpy(vm, j_vm, 16 * sizeof(float));
-
-	(*env)->ReleaseFloatArrayElements(env, j_vmArray, j_vm, 0);
-}
-
-static jobjectArray scene_get_entities(JNIEnv *env, jobject scene, jsize *len)
-{
-	jclass sclass = (*env)->GetObjectClass(env, scene);
-
-	jmethodID get_entities = (*env)->GetMethodID(env, sclass,
-		"getEntitiesArray", "()[Lcom/example/p/engine/Entity;");
-
-	jobjectArray jentities = (*env)->CallObjectMethod(env, scene, get_entities);
-
-	*len = (*env)->GetArrayLength(env, jentities);
-
-	return jentities;
-}
-
-static void entity_model_matrix(JNIEnv *env, jobject entity, float mm[16])
-{
-	jclass eclass = (*env)->GetObjectClass(env, entity);
-
-	jmethodID get_mm = (*env)->GetMethodID(env, eclass,
-					       "getModelMatrix", "()[F");
-
-	jfloatArray jmmArray = NULL;
-	jmmArray = (*env)->CallObjectMethod(env, entity, get_mm);
-
-	jfloat *jmm = (*env)->GetFloatArrayElements(env, jmmArray, NULL);
-
-	memcpy(mm, jmm, 16 * sizeof(float));
-
-	(*env)->ReleaseFloatArrayElements(env, jmmArray, jmm, 0);
-}
-
-static jobject entity_get_model(JNIEnv *env, jobject entity)
-{
-	jclass eclass = (*env)->GetObjectClass(env, entity);
-
-	jmethodID get_model = (*env)->GetMethodID(env, eclass,
-		"getModel", "()Lcom/example/p/engine/Model;");
-
-	return (*env)->CallObjectMethod(env, entity, get_model);
-}
-
-static jint get_entity_model_id(JNIEnv *env, jobject entity)
-{
-	jobject jmodel = entity_get_model(env, entity);
-	jclass mclass = (*env)->GetObjectClass(env, jmodel);
-
-	jmethodID get_id = (*env)->GetMethodID(env, mclass, "getId", "()I");
-	return (*env)->CallIntMethod(env, jmodel, get_id);
-}
-
-static void render_model(struct model_info *model)
+static void draw_model(struct model_info *model)
 {
 	int i;
 	for (i = 0; i < model->num_meshes; i++) {
 		struct mesh_info *mesh = &model->meshes[i];
 
-		glUniform1i(program->uniform_locations[has_texture], mesh->num_textures > 0);
+		glUniform1i(program.uflocs[has_texture_loc], mesh->ntexts > 0);
 		check_gl_error("glUniform1i");
 
-		render_mesh(program->id, mesh);
+		glUniform1i(program.uflocs[has_nmap_loc], mesh->has_nmap != 0);
+		check_gl_error("glUniform1i");
+
+		glUniform1i(program.uflocs[has_smap_loc], mesh->has_smap != 0);
+		check_gl_error("glUniform1i");
+
+		render_mesh(program.id, mesh);
+	}
+}
+
+static void draw_models(JNIEnv *env, jobject scene)
+{
+	jsize mentities_len;
+	jobjectArray mentities = jscene_get_mentities(env, scene, &mentities_len);
+	int i;
+	for (i = 0; i < mentities_len; i++) {
+		jobject entity = (*env)->GetObjectArrayElement(env, mentities, i);
+
+		int vis = jentity_is_visible(env, entity);
+		if (!vis) {
+			continue;
+		}
+
+		jobject resource = jget_resource(env, entity);
+		int selected = jentity_is_selected(env, entity);
+
+		jint id = jget_resource_id(env, resource);
+		struct model_info *model = get_model(id);
+		if (model == NULL) {
+			AGR_WARN("resource(%d) not loaded, skipping...", id);
+			return;
+		}
+
+		float mm[16];
+		jentity_model_matrix(env, entity, mm);
+
+		float vpos[3];
+		jscene_get_camera_pos(env, scene, vpos);
+
+		glUniformMatrix4fv(program.uflocs[mmatrix_loc], 1, GL_FALSE, (const GLfloat *) mm);
+		check_gl_error("glUniformMatrix4fv");
+
+		glUniform3fv(program.uflocs[view_pos_loc], 1, vpos);
+		check_gl_error("glUniform3fv");
+
+		glUniform3fv(program.uflocs[dlight_dir_loc], 1, dlight_dir);
+		check_gl_error("glUniform3fv");
+
+		glUniform1i(program.uflocs[selected_loc], selected);
+		check_gl_error("glUniform1i");
+
+		draw_model(model);
 	}
 }
 
@@ -268,43 +315,26 @@ Java_com_example_p_engine_AGRenderer_draw(JNIEnv *env, jobject instance,
 					  jobject scene)
 {
 	enable_depth_test();
-	shader_program_bind(program);
+	shader_program_bind(&program);
 
 
-	glUniformMatrix4fv(program->uniform_locations[pmatrix], 1, GL_FALSE, (const GLfloat *) projection_matrix);
+	glUniformMatrix4fv(program.uflocs[pmatrix_loc], 1, GL_FALSE, (const GLfloat *) projection_matrix);
 	check_gl_error("glUniformMatrix4fv");
 
 
 	float vm[16];
-	scene_view_matrix(env, scene, vm);
-	glUniformMatrix4fv(program->uniform_locations[vmatrix], 1, GL_FALSE, (const GLfloat *) vm);
+	jscene_get_view_matrix(env, scene, vm);
+	glUniformMatrix4fv(program.uflocs[vmatrix_loc], 1, GL_FALSE, (const GLfloat *) vm);
 	check_gl_error("glUniformMatrix4fv");
 
 
-	jsize entities_len;
-	jobjectArray entities = scene_get_entities(env, scene, &entities_len);
-	int i;
-	for (i = 0; i < entities_len; i++) {
-		jobject entity = (*env)->GetObjectArrayElement(env, entities, i);
-		float mm[16];
+	draw_models(env, scene);
 
-		jint id = get_entity_model_id(env, entity);
-		struct model_info *model = get_model(id);
-		if (model == NULL) {
-			AGR_WARN("model(%d) not loaded, skipping...", id);
-			continue;
-		}
+	disable_depth_test();
+	draw_imgs(env, scene);
 
-		entity_model_matrix(env, entity, mm);
-
-		glUniformMatrix4fv(program->uniform_locations[mmatrix], 1, GL_FALSE, (const GLfloat *) mm);
-		check_gl_error("glUniformMatrix4fv");
-
-		render_model(model);
-	}
 
 	shader_program_unbind();
-	disable_depth_test();
 }
 
 JNIEXPORT void JNICALL
@@ -324,6 +354,10 @@ Java_com_example_p_engine_AGRenderer_draw_1camera(JNIEnv *env, jobject instance,
 		ratioW = ratioH / ratio;
 	}
 
+	//ratioW /= (float) 100;
+	//ratioH /= (float) 100;
+	//glGenerateMipmap(camera_mesh.texts[0].id);
+
 	static mat4x4 camera_mmatrix;
 	mat4x4_identity(camera_mmatrix);
 	mat4x4_scale_aniso(camera_mmatrix, camera_mmatrix, ratioW, ratioH, 1.0f);
@@ -332,13 +366,51 @@ Java_com_example_p_engine_AGRenderer_draw_1camera(JNIEnv *env, jobject instance,
 	check_gl_error("unknown");
 	shader_program_bind(&camera_program);
 
-	glUniformMatrix4fv(camera_program.uniform_locations[pmatrix], 1, GL_FALSE, (const GLfloat *) ortho_matrix);
+	glUniformMatrix4fv(camera_program.uflocs[pmatrix_loc], 1, GL_FALSE, (const GLfloat *) ratio_ortho_matrix);
 	check_gl_error("glUniformMatrix4fv");
 
-	glUniformMatrix4fv(camera_program.uniform_locations[mmatrix], 1, GL_FALSE, (const GLfloat *) camera_mmatrix);
+	glUniformMatrix4fv(camera_program.uflocs[mmatrix_loc], 1, GL_FALSE, (const GLfloat *) camera_mmatrix);
 	check_gl_error("glUniformMatrix4fv");
 
 	render_mesh(camera_program.id, &camera_mesh);
 
+	/*char *img = malloc(width * height * 4);
+	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, img);
+	long tr = 0;
+	long tg = 0;
+	long tb = 0;
+	long ta = 0;
+
+	int siz = width * height * 4;
+	int i;
+	for (i = 0; i < siz; i += 4) {
+		tr += img[i];
+		tg += img[i + 1];
+		tb += img[i + 2];
+		ta += img[i + 3];
+	}
+
+	long ar = tr / (siz / 4);
+	long ag = tg / (siz / 4);
+	long ab = tb / (siz / 4);
+	long aa = ta / (siz / 4);
+
+	AGR_INFO("average: (%d, %d, %d, %d)", ar, ag, ab, aa);
+	free(img);*/
+
 	shader_program_unbind();
+}
+
+JNIEXPORT void JNICALL
+Java_com_example_p_engine_AGRenderer_draw_1text(JNIEnv *env, jobject instance, jstring text_,
+						jfloat x, jfloat y, jfloat scale,
+						jfloatArray color_)
+{
+	const char *text = (*env)->GetStringUTFChars(env, text_, 0);
+	jfloat *color = (*env)->GetFloatArrayElements(env, color_, NULL);
+
+	render_text(text, x, y, scale, color);
+
+	(*env)->ReleaseStringUTFChars(env, text_, text);
+	(*env)->ReleaseFloatArrayElements(env, color_, color, 0);
 }

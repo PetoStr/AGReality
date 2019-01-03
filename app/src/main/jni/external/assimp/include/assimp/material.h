@@ -177,14 +177,14 @@ enum aiTextureMapping
 /** @brief Defines the purpose of a texture
  *
  *  This is a very difficult topic. Different 3D packages support different
- *  kinds of textures. For very common texture types, such as bumpmaps, the
+ *  kinds of texts. For very common texture types, such as bumpmaps, the
  *  rendering results depend on implementation details in the rendering
  *  pipelines of these applications. Assimp loads all texture references from
  *  the model file and tries to determine which of the predefined texture
  *  types below is the best choice to match the original use of the texture
  *  as closely as possible.<br>
  *
- *  In content pipelines you'll usually define how textures have to be handled,
+ *  In content pipelines you'll usually define how texts have to be handled,
  *  and the artists working on models have to conform to this specification,
  *  regardless which 3D tool they're using.
  */
@@ -194,7 +194,7 @@ enum aiTextureType
      *
      *  No texture, but the value to be used as 'texture semantic'
      *  (#aiMaterialProperty::mSemantic) for all material properties
-     *  *not* related to textures.
+     *  *not* related to texts.
      */
     aiTextureType_NONE = 0x0,
 
@@ -365,7 +365,7 @@ enum aiShadingMode
 // ---------------------------------------------------------------------------
 /** @brief Defines some mixed flags for a particular texture.
  *
- *  Usually you'll instruct your cg artists how textures have to look like ...
+ *  Usually you'll instruct your cg artists how texts have to look like ...
  *  and how they will be processed in your application. However, if you use
  *  Assimp for completely generic loading purposes you might also need to
  *  process these flags in order to display as many 'unknown' 3D models as
@@ -716,9 +716,9 @@ public:
         unsigned int idx, aiUVTransform& pOut) const;
 
     // -------------------------------------------------------------------
-    /** Get the number of textures for a particular texture type.
+    /** Get the number of texts for a particular texture type.
      *  @param type Texture type to check for
-     *  @return Number of textures for this type.
+     *  @return Number of texts for this type.
      *  @note A texture can be easily queried using #GetTexture() */
     unsigned int GetTextureCount(aiTextureType type) const;
 
@@ -732,11 +732,11 @@ public:
      *    e.g. diffuse, specular, height map ...)
      *  @param index Index of the texture to be retrieved. The function fails
      *    if there is no texture of that type with this index.
-     *    #GetTextureCount() can be used to determine the number of textures
+     *    #GetTextureCount() can be used to determine the number of texts
      *    per texture type.
      *  @param path Receives the path to the texture.
      *    If the texture is embedded, receives a '*' followed by the id of
-     *    the texture (for the textures stored in the corresponding scene) which
+     *    the texture (for the texts stored in the corresponding scene) which
      *    can be converted to an int using a function like atoi.
      *    NULL is a valid value.
      *  @param mapping The texture mapping.
@@ -1495,10 +1495,10 @@ ASSIMP_API C_ENUM aiReturn aiGetMaterialString(const C_STRUCT aiMaterial* pMat,
     C_STRUCT aiString* pOut);
 
 // ---------------------------------------------------------------------------
-/** Get the number of textures for a particular texture type.
+/** Get the number of texts for a particular texture type.
  *  @param[in] pMat Pointer to the input material. May not be NULL
  *  @param type Texture type to check for
- *  @return Number of textures for this type.
+ *  @return Number of texts for this type.
  *  @note A texture can be easily queried using #aiGetMaterialTexture() */
 // ---------------------------------------------------------------------------
 ASSIMP_API unsigned int aiGetMaterialTextureCount(const C_STRUCT aiMaterial* pMat,
@@ -1518,15 +1518,15 @@ ASSIMP_API unsigned int aiGetMaterialTextureCount(const C_STRUCT aiMaterial* pMa
  *  @param[in] index Index of the texture. The function fails if the
  *     requested index is not available for this texture type.
  *     #aiGetMaterialTextureCount() can be used to determine the number of
- *     textures in a particular texture stack.
+ *     texts in a particular texture stack.
  *  @param[out] path Receives the output path
  *     If the texture is embedded, receives a '*' followed by the id of
- *     the texture (for the textures stored in the corresponding scene) which
+ *     the texture (for the texts stored in the corresponding scene) which
  *     can be converted to an int using a function like atoi.
  *     This parameter must be non-null.
  *  @param mapping The texture mapping mode to be used.
  *      Pass NULL if you're not interested in this information.
- *  @param[out] uvindex For UV-mapped textures: receives the index of the UV
+ *  @param[out] uvindex For UV-mapped texts: receives the index of the UV
  *      source channel. Unmodified otherwise.
  *      Pass NULL if you're not interested in this information.
  *  @param[out] blend Receives the blend factor for the texture

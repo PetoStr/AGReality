@@ -44,9 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @file texture.h
  *  @brief Defines texture helper structures for the library
  *
- * Used for file formats which embed their textures into the model file.
- * Supported are both normal textures, which are stored as uncompressed
- * pixels, and "compressed" textures, which are stored in a file format
+ * Used for file formats which embed their texts into the model file.
+ * Supported are both normal texts, which are stored as uncompressed
+ * pixels, and "compressed" texts, which are stored in a file format
  * such as PNG or TGA.
  */
 #pragma once
@@ -71,7 +71,7 @@ extern "C" {
 
 /** @def AI_MAKE_EMBEDDED_TEXNAME
  *  Used to build the reserved path name used by the material system to
- *  reference textures that are embedded into their corresponding
+ *  reference texts that are embedded into their corresponding
  *  model files. The parameter specifies the index of the texture
  *  (zero-based, in the aiScene::mTextures array)
  */
@@ -120,14 +120,14 @@ struct aiTexel
 // --------------------------------------------------------------------------------
 /** Helper structure to describe an embedded texture
  *
- * Normally textures are contained in external files but some file formats embed
- * them directly in the model file. There are two types of embedded textures:
- * 1. Uncompressed textures. The color data is given in an uncompressed format.
- * 2. Compressed textures stored in a file format like png or jpg. The raw file
+ * Normally texts are contained in external files but some file formats embed
+ * them directly in the model file. There are two types of embedded texts:
+ * 1. Uncompressed texts. The color data is given in an uncompressed format.
+ * 2. Compressed texts stored in a file format like png or jpg. The raw file
  * bytes are given so the application must utilize an image decoder (e.g. DevIL) to
  * get access to the actual color data.
  *
- * Embedded textures are referenced from materials using strings like "*0", "*1", etc.
+ * Embedded texts are referenced from materials using strings like "*0", "*1", etc.
  * as the texture paths (a single asterisk character followed by the
  * zero-based index of the texture in the aiScene::mTextures array).
  */
@@ -148,7 +148,7 @@ struct aiTexture {
     unsigned int mHeight;
 
     /** A hint from the loader to make it easier for applications
-     *  to determine the type of embedded textures.
+     *  to determine the type of embedded texts.
      *
      * If mHeight != 0 this member is show how data is packed. Hint will consist of
      * two parts: channel order and channel bitness (count of the bits for every
@@ -187,7 +187,7 @@ struct aiTexture {
 
 #ifdef __cplusplus
 
-    //! For compressed textures (mHeight == 0): compare the
+    //! For compressed texts (mHeight == 0): compare the
     //! format hint against a given string.
     //! @param s Input string. 3 characters are maximally processed.
     //!        Example values: "jpg", "png"

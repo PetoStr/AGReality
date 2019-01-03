@@ -2,6 +2,7 @@ package com.example.p.engine;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.view.MotionEvent;
 
 public class AGSurfaceView extends GLSurfaceView {
 
@@ -19,6 +20,20 @@ public class AGSurfaceView extends GLSurfaceView {
 		agRenderer = new AGRenderer();
 		setEGLContextFactory(agRenderer);
 		setRenderer(agRenderer);
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		int actionIndex = event.getActionIndex();
+
+		int pointerId = event.getPointerId(actionIndex);
+		int action = event.getActionMasked();
+		float x = event.getX(actionIndex);
+		float y = event.getY(actionIndex);
+
+		agRenderer.onTouch(pointerId, x, y, action);
+
+		return true;
 	}
 
 }

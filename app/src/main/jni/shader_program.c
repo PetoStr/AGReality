@@ -6,7 +6,7 @@
 #include "files.h"
 #include "util.h"
 
-void shader_program_bind(struct program_info *p)
+void shader_program_bind(const struct program_info *p)
 {
 	glUseProgram(p->id);
 	check_gl_error("glUseProgram");
@@ -23,7 +23,7 @@ static void print_shader_info(struct shader_info *shdr)
 	glGetShaderiv(shdr->id, GL_INFO_LOG_LENGTH, &len);
 	GLchar m[len];
 	glGetShaderInfoLog(shdr->id, len, &len, m);
-	AGR_ERROR("%s compilation failed: %s\n", shdr->file_name, m);
+	AGR_ERROR("%s compilation failed: %s\n", shdr->fname, m);
 }
 
 static void print_program_info(GLint pid)
@@ -39,8 +39,9 @@ static void create_shader(struct shader_info *shdr, GLenum type)
 {
 	shdr->id = glCreateShader(type);
 
-	char *src = read_file(shdr->file_name, NULL);
-	AGR_INFO("compiling shader:\n%s", src);
+	char *src = NULL;
+	read_file(&src, shdr->fname);
+	AGR_INFO("compiling shader %s", shdr->fname);
 	glShaderSource(shdr->id, 1, (const GLchar **) &src, NULL);
 	glCompileShader(shdr->id);
 
@@ -83,24 +84,18 @@ static void link_shaders(GLint p, GLint vs, GLint fs)
 	check_gl_error("glDeleteShader");
 }
 
-static void bind_attrib_locations(GLint program_id)
-{
-	glBindAttribLocation(program_id, 0, "in_pos");
-	check_gl_error("glBindAttribLocation");
-	glBindAttribLocation(program_id, 1, "in_norm");
-	check_gl_error("glBindAttribLocation");
-	glBindAttribLocation(program_id, 2, "in_uv");
-	check_gl_error("glBindAttribLocation");
-}
-
-void create_program(struct program_info *p)
+void create_program(struct program_info *p, const struct shader_attrib *atbs, size_t atbs_len)
 {
 	create_shader(&p->vs, GL_VERTEX_SHADER);
 	create_shader(&p->fs, GL_FRAGMENT_SHADER);
 
 	p->id = glCreateProgram();
 
-	bind_attrib_locations(p->id);
+	size_t i = atbs_len;
+	while (i--) {
+		glBindAttribLocation(p->id, atbs[i].index, atbs[i].name);
+		check_gl_error("glBindAttribLocation");
+	}
 
 	link_shaders(p->id, p->vs.id, p->fs.id);
 }

@@ -1,12 +1,13 @@
 //#version 300 es
-
-uniform mat4 MMatrix;
-uniform mat4 PMatrix;
+#version 100
 
 attribute vec3 in_pos;
 attribute vec2 in_uv;
 
 varying vec2 f_uv;
+
+uniform mat4 MMatrix;
+uniform mat4 PMatrix;
 
 void main(void)
 {

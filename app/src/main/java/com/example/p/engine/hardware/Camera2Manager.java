@@ -1,6 +1,8 @@
 package com.example.p.engine.hardware;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -17,26 +19,26 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.util.Range;
 import android.util.Size;
 import android.util.SparseIntArray;
+import android.view.Display;
 import android.view.Surface;
+import android.view.WindowManager;
 
-import com.example.p.engine.MainActivity;
+import com.example.p.engine.App;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public enum Camera2Manager implements ActivityCompat.OnRequestPermissionsResultCallback,
-		SurfaceTexture.OnFrameAvailableListener, Hardware {
+public enum Camera2Manager implements SurfaceTexture.OnFrameAvailableListener, AGSensor {
 
 	INSTANCE;
 
 	private static final String TAG = Camera2Manager.class.getName();
 
 	private String cameraId;
-
-	private static Context context;
 
 	private Size previewSize;
 
@@ -67,24 +69,26 @@ public enum Camera2Manager implements ActivityCompat.OnRequestPermissionsResultC
 		ORIENTATIONS.append(Surface.ROTATION_90, 180);
 		ORIENTATIONS.append(Surface.ROTATION_180, 270);
 		ORIENTATIONS.append(Surface.ROTATION_270, 0);
-		context = MainActivity.INSTANCE.getApplicationContext();
 	}
 
 	public void createSurfaceTexture(int textureId) {
 		surfaceTexture = new SurfaceTexture(textureId);
+		surfaceTexture.setOnFrameAvailableListener(this, cameraHandler);
 	}
 
 	@Override
 	public void start() {
+		if (surfaceTexture == null) return;
+
 		startCameraThread();
 		if (surfaceTexture != null && captureSession == null) {
 			openCamera();
-			surfaceTexture.setOnFrameAvailableListener(this, cameraHandler);
 		}
 	}
 
 	@Override
 	public void stop() {
+		isAvailable = false;
 		closeCamera();
 		stopCameraThread();
 	}
@@ -108,12 +112,12 @@ public enum Camera2Manager implements ActivityCompat.OnRequestPermissionsResultC
 	}
 
 	private void openCamera() {
-		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-			ActivityCompat.requestPermissions(MainActivity.INSTANCE, new String[] { Manifest.permission.CAMERA }, 1);
+		int cameraPermission = ActivityCompat.checkSelfPermission(App.getContext(), Manifest.permission.CAMERA);
+		if (cameraPermission != PackageManager.PERMISSION_GRANTED) {
 			return;
 		}
 
-		CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+		CameraManager manager = (CameraManager) App.getContext().getSystemService(Context.CAMERA_SERVICE);
 		try {
 			for (String cameraId : manager.getCameraIdList()) {
 				CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
@@ -124,7 +128,8 @@ public enum Camera2Manager implements ActivityCompat.OnRequestPermissionsResultC
 
 					// Find out if we need to swap dimension to get the preview size relative to sensor
 					// coordinate.
-					int displayRotation = MainActivity.INSTANCE.getWindowManager().getDefaultDisplay().getRotation();
+					Display display = ((WindowManager) App.getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+					int displayRotation = display.getRotation();
 					//noinspection ConstantConditions
 					sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 
@@ -137,13 +142,12 @@ public enum Camera2Manager implements ActivityCompat.OnRequestPermissionsResultC
 					if (!cameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
 						throw new RuntimeException("Time out waiting to lock camera opening.");
 					}
+
 					manager.openCamera(cameraId, stateCallback, cameraHandler);
 					break;
 				}
 			}
-		} catch (CameraAccessException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
+		} catch (CameraAccessException | InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -193,15 +197,44 @@ public enum Camera2Manager implements ActivityCompat.OnRequestPermissionsResultC
 		}
 	};
 
+	private Range<Integer> getRange() {
+		CameraManager cameraManager = (CameraManager) App.getContext().getSystemService(Context.CAMERA_SERVICE);
+		CameraCharacteristics chars = null;
+
+		try {
+			chars = cameraManager.getCameraCharacteristics(cameraId);
+		} catch (CameraAccessException e) {
+			e.printStackTrace();
+		}
+
+		Range<Integer>[] ranges = chars.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
+		Range<Integer> result = null;
+
+		for (Range<Integer> range : ranges) {
+			int upper = range.getUpper();
+
+			if (upper >= 30) {
+				if (result == null || upper < result.getUpper()) {
+					result = range;
+				}
+			}
+		}
+
+		return result;
+	}
+
 	private void startPreview() {
 		surfaceTexture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
 
 		Surface surface = new Surface(surfaceTexture);
 		try {
-			captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+			captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+			captureRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, getRange());
+			captureRequestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, false);
+			captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
 			captureRequestBuilder.addTarget(surface);
 
-			cameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback() {
+			cameraDevice.createCaptureSession(Collections.singletonList(surface), new CameraCaptureSession.StateCallback() {
 				@Override
 				public void onConfigured(@NonNull CameraCaptureSession session) {
 					Log.v(TAG, "onConfigured(): " + session);
@@ -236,9 +269,9 @@ public enum Camera2Manager implements ActivityCompat.OnRequestPermissionsResultC
 		surfaceTexture.updateTexImage();
 	}
 
-	@Override
-	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-		start();
+	public void eglContextDestroyed() {
+		surfaceTexture = null;
+		isAvailable = false;
 	}
 
 	@Override

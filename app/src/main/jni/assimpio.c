@@ -1,8 +1,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include <assimpio.h>
-#include <agrlog.h>
+#include "agrlog.h"
+#include "assimpio.h"
 
 aiFileReadProc custom_read(C_STRUCT aiFile* file, char* ptr,
 			   size_t size_of_elements,
@@ -10,7 +10,7 @@ aiFileReadProc custom_read(C_STRUCT aiFile* file, char* ptr,
 {
 	assert(ptr != NULL);
 	size_t count = size_of_elements * number_of_elements;
-	return (aiFileReadProc) AAsset_read((AAsset *) file->UserData,
+	return (aiFileReadProc) (size_t) AAsset_read((AAsset *) file->UserData,
 					    ptr, count);
 }
 

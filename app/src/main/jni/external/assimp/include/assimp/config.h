@@ -177,7 +177,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 /** @brief Sets the colormap (= palette) to be used to decode embedded
- *         textures in MDL (Quake or 3DGS) files.
+ *         texts in MDL (Quake or 3DGS) files.
  *
  * This must be a valid path to a file. The file is 768 (256*3) bytes
  * large and contains RGB triplets for each of the 256 palette entries.
@@ -425,7 +425,7 @@ enum aiComponent
      * use the #aiProcess_OptimizeGraph step to do this */
     aiComponent_ANIMATIONS = 0x40,
 
-    /** Removes all embedded textures (aiScene::mTextures) */
+    /** Removes all embedded texts (aiScene::mTextures) */
     aiComponent_TEXTURES = 0x80,
 
     /** Removes all light sources (aiScene::mLights).
@@ -573,7 +573,7 @@ enum aiComponent
     "IMPORT_FBX_READ_MATERIALS"
 
 // ---------------------------------------------------------------------------
-/** @brief Set whether the fbx importer will read embedded textures.
+/** @brief Set whether the fbx importer will read embedded texts.
  *
  * The default value is true (1)
  * Property type: bool
@@ -709,7 +709,7 @@ enum aiComponent
  *
  * UV coordinates for terrains are so simple to compute that you'll usually
  * want to compute them on your own, if you need them. This option is intended
- * for model viewers which want to offer an easy way to apply textures to
+ * for model viewers which want to offer an easy way to apply texts to
  * terrains.
  * * Property type: bool. Default value: false.
  */
@@ -755,13 +755,13 @@ enum aiComponent
  *  MD3 file. This can also be a search path.
  *
  * By default Assimp's behaviour is as follows: If a MD3 file
- * <tt>any_path/models/any_q3_subdir/model_name/file_name.md3</tt> is
+ * <tt>any_path/models/any_q3_subdir/model_name/fname.md3</tt> is
  * loaded, the library tries to locate the corresponding shader file in
  * <tt>any_path/scripts/model_name.shader</tt>. This property overrides this
  * behaviour. It can either specify a full path to the shader to be loaded
  * or alternatively the path (relative or absolute) to the directory where
  * the shaders for all MD3s to be loaded reside. Assimp attempts to open
- * <tt>IMPORT_MD3_SHADER_SRC/model_name.shader</tt> first, <tt>IMPORT_MD3_SHADER_SRC/file_name.shader</tt>
+ * <tt>IMPORT_MD3_SHADER_SRC/model_name.shader</tt> first, <tt>IMPORT_MD3_SHADER_SRC/fname.shader</tt>
  * is the fallback file. Note that IMPORT_MD3_SHADER_SRC should have a terminal (back)slash.
  * Property type: String. Default value: n/a.
  */
@@ -844,9 +844,9 @@ enum aiComponent
 // ---------------------------------------------------------------------------
 /** @brief Ogre Importer detect the texture usage from its filename.
  *
- * Ogre material texture units do not define texture type, the textures usage
+ * Ogre material texture units do not define texture type, the texts usage
  * depends on the used shader or Ogre's fixed pipeline. If this config property
- * is true Assimp will try to detect the type from the textures filename postfix:
+ * is true Assimp will try to detect the type from the texts filename postfix:
  * _n, _nrm, _nrml, _normal, _normals and _normalmap for normal map, _s, _spec,
  * _specular and _specularmap for specular map, _l, _light, _lightmap, _occ
  * and _occlusion for light map, _disp and _displacement for displacement map.
