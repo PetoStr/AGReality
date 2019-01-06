@@ -200,7 +200,7 @@ void jientity_set_size(JNIEnv *env, jobject ientity, float width, float height)
 }
 
 JNIEXPORT jfloatArray JNICALL
-Java_com_example_p_engine_Screen_jget_1pmatrix(JNIEnv *env, jclass type)
+Java_com_example_p_engine_Screen_get_1pmatrix(JNIEnv *env, jclass type)
 {
 	jfloatArray pm = (*env)->NewFloatArray(env, 16);
 

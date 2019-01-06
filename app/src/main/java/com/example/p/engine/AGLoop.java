@@ -1,8 +1,6 @@
-package com.example.p.agreality;
+package com.example.p.engine;
 
-import com.example.p.engine.AGRenderer;
-
-public interface SimpleLogic {
+public interface AGLoop {
 
 	void init();
 

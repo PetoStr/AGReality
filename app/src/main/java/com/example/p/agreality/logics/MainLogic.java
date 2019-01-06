@@ -8,11 +8,10 @@ import android.view.WindowManager;
 
 import com.example.p.agreality.Config;
 import com.example.p.agreality.CustomScene;
-import com.example.p.agreality.LogicState;
 import com.example.p.agreality.entities.imgs.SimpleButton;
 import com.example.p.agreality.entities.imgs.control.MovementButton;
 import com.example.p.agreality.entities.imgs.control.RotationButton;
-import com.example.p.agreality.entities.imgs.control.SetDirLightButton;
+import com.example.p.agreality.entities.imgs.SetDirLightButton;
 import com.example.p.agreality.entities.models.Nanosuit;
 import com.example.p.agreality.entities.models.OfficeChair;
 import com.example.p.agreality.entities.models.Wraith;
@@ -173,15 +172,6 @@ public class MainLogic extends AbstractLogic  {
 			showListImgs(true);
 			showControlImgs(false);
 		});
-
-		posY -= 2 * h;
-
-		ImageEntity setDirLight = new SetDirLightButton(scene);
-		setDirLight.setPosition(new Vector3f(posX, posY, 0.0f));
-		setDirLight.setWidth(w);
-		setDirLight.setHeight(h);
-		addImageEntity(setDirLight);
-		controlImgs.add(setDirLight);
 	}
 
 	private void initListElements() {
@@ -292,6 +282,15 @@ public class MainLogic extends AbstractLogic  {
 		removeModel.registerOnTouch(() -> {
 			scene.removeModeledEntity(scene.getSelectedModeledEntity());
 		});
+
+		posX = Screen.getWidth() - posX - w;
+		posY -= 2 * h;
+
+		ImageEntity setDirLight = new SetDirLightButton(scene);
+		setDirLight.setPosition(new Vector3f(posX, posY, 0.0f));
+		setDirLight.setWidth(w);
+		setDirLight.setHeight(h);
+		addImageEntity(setDirLight);
 	}
 
 	private void initScene() {
@@ -371,13 +370,17 @@ public class MainLogic extends AbstractLogic  {
 	}
 
 	@Override
+	public void update(float frameTime) {
+		scene.updateAll(frameTime);
+	}
+
+	@Override
 	public void draw(AGRenderer renderer) {
 		renderer.clear();
 
-		scene.updateAll(frameTime);
-
 		if (Camera2Manager.INSTANCE.isAvailable()) {
-			Camera2Manager.INSTANCE.update();
+			Camera2Manager.INSTANCE.updateTexture();
+
 			float rotation = getCameraRotation();
 			Size size = Camera2Manager.INSTANCE.getPreviewSize();
 

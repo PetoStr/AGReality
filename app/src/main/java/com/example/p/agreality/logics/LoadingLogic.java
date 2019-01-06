@@ -3,7 +3,6 @@ package com.example.p.agreality.logics;
 import android.util.Pair;
 
 import com.example.p.agreality.Config;
-import com.example.p.agreality.LogicState;
 import com.example.p.engine.AGRenderer;
 import com.example.p.engine.MainActivity;
 import com.example.p.engine.Scene;
@@ -88,6 +87,11 @@ public class LoadingLogic extends AbstractLogic {
 
 	@Override
 	public void init() {
+
+	}
+
+	@Override
+	public void update(float frameTime) {
 
 	}
 

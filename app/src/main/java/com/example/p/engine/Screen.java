@@ -21,6 +21,6 @@ public final class Screen {
 		Screen.height = height;
 	}
 
-	public static native float[] jget_pmatrix();
+	public static native float[] get_pmatrix();
 
 }

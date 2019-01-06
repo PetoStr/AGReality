@@ -121,7 +121,7 @@ public enum DeviceMovement implements SensorEventListener, AGSensor {
 		return earthAcceleration;
 	}
 
-	public void updateOrientationAndAccel() {
+	private void updateOrientationAndAccel() {
 		float[] rotationMatrix = new float[9];
 
 		if (hasRotationData) {

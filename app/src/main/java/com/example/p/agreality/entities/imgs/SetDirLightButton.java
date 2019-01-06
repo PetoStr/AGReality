@@ -1,4 +1,4 @@
-package com.example.p.agreality.entities.imgs.control;
+package com.example.p.agreality.entities.imgs;
 
 import com.example.p.agreality.Config;
 import com.example.p.agreality.CustomScene;

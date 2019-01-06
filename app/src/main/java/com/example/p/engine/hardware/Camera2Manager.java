@@ -78,7 +78,9 @@ public enum Camera2Manager implements SurfaceTexture.OnFrameAvailableListener, A
 
 	@Override
 	public void start() {
-		if (surfaceTexture == null) return;
+		if (surfaceTexture == null) {
+			return;
+		}
 
 		startCameraThread();
 		if (surfaceTexture != null && captureSession == null) {
@@ -265,7 +267,7 @@ public enum Camera2Manager implements SurfaceTexture.OnFrameAvailableListener, A
 		return (ORIENTATIONS.get(rotation) + sensorOrientation + 270) % 360;
 	}
 
-	public void update() {
+	public void updateTexture() {
 		surfaceTexture.updateTexImage();
 	}
 

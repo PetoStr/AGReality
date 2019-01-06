@@ -29,10 +29,8 @@ static const int vmatrix_loc = 1;
 static const int pmatrix_loc = 2;
 static const int has_texture_loc = 3;
 static const int selected_loc = 4;
-static const int has_nmap_loc = 5;
-static const int has_smap_loc = 6;
-static const int view_pos_loc = 7;
-static const int dlight_dir_loc = 8;
+static const int view_pos_loc = 5;
+static const int dlight_dir_loc = 6;
 
 static float dlight_dir[] = { 0.0f, 0.0f, -1.0f };
 
@@ -93,18 +91,21 @@ Java_com_example_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
 	check_gl_error("glGetUniformLocation> has_texture");
 	program.uflocs[selected_loc] = glGetUniformLocation(program.id, "selected");
 	check_gl_error("glGetUniformLocation> selected");
-	program.uflocs[has_nmap_loc] = glGetUniformLocation(program.id, "has_nmap");
-	check_gl_error("glGetUniformLocation> has_nmap");
-	program.uflocs[has_smap_loc] = glGetUniformLocation(program.id, "has_smap");
-	check_gl_error("glGetUniformLocation> has_smap_loc");
 	program.uflocs[view_pos_loc] = glGetUniformLocation(program.id, "view_pos");
 	check_gl_error("glGetUniformLocation> view_pos");
 	program.uflocs[dlight_dir_loc] = glGetUniformLocation(program.id, "dlight_dir");
 	check_gl_error("glGetUniformLocation> dlight_dir");
 
+
+	const int cam_atbs_len = 2;
+	struct shader_attrib cam_atbs[atbs_len] = {
+		{ 0, "in_pos" },
+		{ 2, "in_uv" }
+	};
+
 	strcpy((char *) camera_program.vs.fname, "shaders/camera_vs.glsl");
 	strcpy((char *) camera_program.fs.fname, "shaders/camera_fs.glsl");
-	create_program(&camera_program, atbs, atbs_len);
+	create_program(&camera_program, cam_atbs, cam_atbs_len);
 	check_gl_error("create_program");
 
 	camera_program.uflocs[mmatrix_loc] = glGetUniformLocation(camera_program.id, "MMatrix");
@@ -202,7 +203,7 @@ Java_com_example_p_engine_AGRenderer_create_1oes_1texture(JNIEnv *env, jobject i
 			       NULL, 0,
 			       indices, sizeof(indices));
 
-	camera_mesh.texts = malloc(sizeof(*camera_mesh.texts));
+	camera_mesh.texts = calloc(1, sizeof(*camera_mesh.texts));
 	camera_mesh.ntexts = 1;
 
 	char type[] = "camera";
@@ -252,13 +253,7 @@ static void draw_model(struct model_info *model)
 	for (i = 0; i < model->num_meshes; i++) {
 		struct mesh_info *mesh = &model->meshes[i];
 
-		glUniform1i(program.uflocs[has_texture_loc], mesh->ntexts > 0);
-		check_gl_error("glUniform1i");
-
-		glUniform1i(program.uflocs[has_nmap_loc], mesh->has_nmap != 0);
-		check_gl_error("glUniform1i");
-
-		glUniform1i(program.uflocs[has_smap_loc], mesh->has_smap != 0);
+		glUniform1i(program.uflocs[has_texture_loc], mesh->has_texture);
 		check_gl_error("glUniform1i");
 
 		render_mesh(program.id, mesh);
@@ -354,15 +349,12 @@ Java_com_example_p_engine_AGRenderer_draw_1camera(JNIEnv *env, jobject instance,
 		ratioW = ratioH / ratio;
 	}
 
-	//ratioW /= (float) 100;
-	//ratioH /= (float) 100;
-	//glGenerateMipmap(camera_mesh.texts[0].id);
-
 	static mat4x4 camera_mmatrix;
 	mat4x4_identity(camera_mmatrix);
 	mat4x4_scale_aniso(camera_mmatrix, camera_mmatrix, ratioW, ratioH, 1.0f);
 	mat4x4_rotate_Z(camera_mmatrix, camera_mmatrix, rotation);
 
+	disable_depth_test();
 	check_gl_error("unknown");
 	shader_program_bind(&camera_program);
 

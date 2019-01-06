@@ -4,11 +4,15 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 
+import com.example.p.agreality.MainLoop;
+
 public class AGSurfaceView extends GLSurfaceView {
 
 	public static final int EGL_CONTEXT_CLIENT_VERSION = 3;
 
 	private AGRenderer agRenderer;
+
+	private AGLoop agLoop;
 
 	public AGSurfaceView(Context context) {
 		super(context);
@@ -17,7 +21,9 @@ public class AGSurfaceView extends GLSurfaceView {
 		setPreserveEGLContextOnPause(true);
 		setEGLConfigChooser(8, 8, 8, 8, 16, 0);
 
-		agRenderer = new AGRenderer();
+		agLoop = new MainLoop();
+
+		agRenderer = new AGRenderer(agLoop);
 		setEGLContextFactory(agRenderer);
 		setRenderer(agRenderer);
 	}

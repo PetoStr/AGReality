@@ -1,25 +1,26 @@
 #version 300 es
 
+#define UNKNOWN_TMAP_MASK 0x01
+#define DIFFUSE_TMAP_MASK 0x02
+#define SPECULAR_TMAP_MASK 0x04
+
 precision mediump float;
 
 in vec2 f_uv;
 in vec3 f_norm;
 in vec3 f_pos;
-in mat3 f_TBN;
 
 out vec4 out_color;
 
-uniform bool has_texture;
+uniform int has_texture;
+
 uniform bool selected;
-uniform bool has_nmap;
-uniform bool has_smap;
 
 uniform vec3 view_pos;
 uniform vec3 dlight_dir;
 
 uniform sampler2D texture_diffuse;
 uniform sampler2D texture_specular;
-uniform sampler2D texture_normals;
 
 struct dir_light {
 	vec3 direction;
@@ -50,29 +51,23 @@ void main(void)
 		ambient_intensity = 0.7;
 	}
 
-	vec4 color;
 	vec4 dc;
 	vec4 sc;
-	if (has_texture) {
+	vec3 norm;
+
+	if ((has_texture & DIFFUSE_TMAP_MASK) != 0) {
 		dc = texture(texture_diffuse, f_uv);
 	} else {
 		dc = vec4(0.1, 0.1, 0.1, 1.0);
 	}
 
-	if (has_smap) {
+	if ((has_texture & SPECULAR_TMAP_MASK) != 0) {
 		sc = texture(texture_specular, f_uv);
 	} else {
 		sc = vec4(0.0, 0.0, 0.0, 1.0);
 	}
 
-	vec3 norm;
-	if (has_nmap) {
-		norm = texture(texture_normals, f_uv).rgb;
-		norm = normalize(norm * 2.0 - 1.0);
-		norm = normalize(f_TBN * norm);
-	} else {
-		norm = f_norm;
-	}
+	norm = f_norm;
 
 	out_color = calc_light_color(dlight_dir, norm, dc.rgb, sc.rgb, f_pos);
 }

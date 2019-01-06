@@ -4,8 +4,7 @@ import android.content.res.AssetManager;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
-import com.example.p.agreality.AGLogic;
-import com.example.p.agreality.SimpleLogic;
+import com.example.p.agreality.MainLoop;
 import com.example.p.engine.hardware.Camera2Manager;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -18,26 +17,30 @@ public class AGRenderer implements GLSurfaceView.Renderer, GLSurfaceView.EGLCont
 
 	private static final String TAG = "AGRenderer";
 
-	private SimpleLogic agReality;
+	private AGLoop agLoop;
+
+	public AGRenderer(AGLoop agLoop) {
+		this.agLoop = agLoop;
+	}
 
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-		Camera2Manager.INSTANCE.createSurfaceTexture(create_oes_texture());
-
 		init(App.getContext().getAssets());
 
-		agReality = new AGLogic();
-		agReality.init();
+		Camera2Manager.INSTANCE.createSurfaceTexture(create_oes_texture());
+
+		agLoop.init();
 	}
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		agReality.draw(this);
+		agLoop.draw(this);
 	}
 
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		surface_changed(width, height);
+
 		Screen.setWidth(width);
 		Screen.setHeight(height);
 	}
@@ -63,8 +66,8 @@ public class AGRenderer implements GLSurfaceView.Renderer, GLSurfaceView.EGLCont
 	}
 
 	public void onTouch(int pointerId, float x, float y, int action) {
-		if (agReality != null) {
-			agReality.onTouch(pointerId, x, Screen.getHeight() - y, action);
+		if (agLoop != null) {
+			agLoop.onTouch(pointerId, x, Screen.getHeight() - y, action);
 		}
 	}
 

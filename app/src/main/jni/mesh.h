@@ -7,7 +7,7 @@
 
 struct mesh_info {
 	GLuint vao;
-	GLuint vbos[12];
+	GLuint vbos[6];
 
 	int nvbos;
 
@@ -16,8 +16,7 @@ struct mesh_info {
 	struct texture_info *texts;
 	int ntexts;
 
-	int has_smap;
-	int has_nmap;
+	int has_texture;
 };
 
 extern void create_vertices_buffer(struct mesh_info *mesh,

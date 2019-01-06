@@ -10,8 +10,6 @@ import com.example.p.engine.entities.ModeledEntity;
 import org.joml.AABBf;
 import org.joml.Intersectionf;
 import org.joml.Matrix4f;
-import org.joml.Planef;
-import org.joml.RayAabIntersection;
 import org.joml.Rayf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -86,7 +84,7 @@ public class TouchPicker {
 
 		Vector3f camPos = camera.getPosition();
 
-		float[] pmatrix = Screen.jget_pmatrix();
+		float[] pmatrix = Screen.get_pmatrix();
 		float[] vmatrix = camera.getViewMatrix();
 
 		Matrix4f invPm = new Matrix4f().set(pmatrix).invert();

@@ -21,12 +21,12 @@ public class Scene {
 
 		for (ModeledEntity entity : modeledEntities) {
 			entity.tick(frameTime);
-			entity.update();
+			entity.updateModelMatrix();
 		}
 
 		for (ImageEntity entity : imageEntities) {
 			entity.tick(frameTime);
-			entity.update();
+			entity.updateModelMatrix();
 		}
 
 		if (modeledEntitiesToRemove.size() != 0) {

@@ -42,10 +42,6 @@ public abstract class Entity implements Movable, TouchListener {
 
 	public abstract void tick(float frameTime);
 
-	public void update() {
-		calculateModelMatrix();
-	}
-
 	@Override
 	public void move(Vector3f d) {
 		Vector3f rd = new Vector3f(d).rotate(orientation);
@@ -66,7 +62,7 @@ public abstract class Entity implements Movable, TouchListener {
 		}
 	}
 
-	private void calculateModelMatrix() {
+	public void updateModelMatrix() {
 		Matrix4f mMatrix = new Matrix4f().identity();
 		mMatrix.translate(position);
 		mMatrix.rotate(orientation);

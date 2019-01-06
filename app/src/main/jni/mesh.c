@@ -68,11 +68,10 @@ static inline void begin_mesh_render(GLuint program_id, const struct mesh_info *
 	for (n = 0; n < mesh->ntexts; n++) {
 		struct texture_info *texture = &mesh->texts[n];
 
-		/* leave TEXTURE0 as default black texture */
-		glActiveTexture(GL_TEXTURE0 + n + 1);
+		glActiveTexture(GL_TEXTURE0 + n);
 
 		GLint sampler = glGetUniformLocation(program_id, texture->type);
-		glUniform1i(sampler, n + 1);
+		glUniform1i(sampler, n);
 
 		glBindTexture(texture->target, texture->id);
 	}

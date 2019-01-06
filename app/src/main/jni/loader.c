@@ -18,6 +18,10 @@
 #include "jni_helper.h"
 #include "scene.h"
 
+#define UNKNOWN_TMAP_MASK 0x01
+#define DIFFUSE_TMAP_MASK 0x02
+#define SPECULAR_TMAP_MASK 0x04
+
 struct texture_info create_texture(const char *fname, const char *tname)
 {
 	struct texture_info t = { 0 };
@@ -157,10 +161,15 @@ static void load_material_textures(struct aiMaterial *material,
 		return;
 	}
 
-	if (type == aiTextureType_NORMALS) {
-		mesh->has_nmap = 1;
-	} else if (type == aiTextureType_SPECULAR) {
-		mesh->has_smap = 1;
+	switch (type) {
+		case aiTextureType_DIFFUSE:
+			mesh->has_texture |= DIFFUSE_TMAP_MASK;
+			break;
+		case aiTextureType_SPECULAR:
+			mesh->has_texture |= SPECULAR_TMAP_MASK;
+			break;
+		default:
+			mesh->has_texture |= UNKNOWN_TMAP_MASK;
 	}
 
 	int offset = mesh->ntexts;
@@ -226,8 +235,7 @@ enum LOAD_STATUS load_model(const char *model_name, struct model_info *model)
 			     aiProcess_GenNormals |
 			     aiProcess_FlipUVs |
 			     aiProcess_OptimizeMeshes |
-			     aiProcess_RemoveRedundantMaterials |
-			     aiProcess_CalcTangentSpace, &custom_fileio);
+			     aiProcess_RemoveRedundantMaterials, &custom_fileio);
 	if (!scene) {
 		AGR_ERROR("failed to load model %s\n", model_name);
 		return LOAD_FAILED;
@@ -250,25 +258,6 @@ enum LOAD_STATUS load_model(const char *model_name, struct model_info *model)
 
 		num_indices = mesh->mNumFaces * 3;
 		num_vertices = mesh->mNumVertices * 3;
-
-		/*size_t ind_size = sizeof(unsigned int) * num_indices;
-		unsigned int *ind = malloc(ind_size);
-
-		unsigned int t;
-		for (t = 0; t < mesh->mNumFaces; t++) {
-		    const struct aiFace *face = &mesh->mFaces[t];
-
-		    ind[t * 3 + 0] = face->mIndices[0];
-		    ind[t * 3 + 1] = face->mIndices[1];
-		    ind[t * 3 + 2] = face->mIndices[2];
-		}
-		struct mesh_info m;
-		m = create_buffers((float *) mesh->mVertices, sizeof(float) * num_vertices,
-			   (float *) mesh->mNormals, sizeof(float) * num_vertices,
-			   (float *) mesh->mTextureCoords[0], sizeof(float) * mesh->mNumFaces * 2,
-			   ind, ind_size);
-
-		free(ind);*/
 
 		size_t pos_size = sizeof(float) * num_vertices;
 		float *pos = malloc(pos_size);
@@ -303,10 +292,6 @@ enum LOAD_STATUS load_model(const char *model_name, struct model_info *model)
 			norms[t * 3 + 1] = mesh->mNormals[t].y;
 			norms[t * 3 + 2] = mesh->mNormals[t].z;
 
-			tangents[t * 3 + 0] = mesh->mTangents[t].x;
-			tangents[t * 3 + 1] = mesh->mTangents[t].y;
-			tangents[t * 3 + 2] = mesh->mTangents[t].z;
-
 			if (mesh->mTextureCoords[0]) {
 				tc[t * 2 + 0] = mesh->mTextureCoords[0][t].x;
 				tc[t * 2 + 1] = mesh->mTextureCoords[0][t].y;
@@ -337,9 +322,6 @@ enum LOAD_STATUS load_model(const char *model_name, struct model_info *model)
 		load_material_textures(material, model, &model->meshes[i],
 				       aiTextureType_SPECULAR, "texture_specular",
 				       dir);
-		load_material_textures(material, model, &model->meshes[i],
-				       aiTextureType_NORMALS, "texture_normals",
-				       dir);
 
 		int r;
 		for (r = aiTextureType_NONE; r < aiTextureType_UNKNOWN; r++) {
@@ -350,6 +332,8 @@ enum LOAD_STATUS load_model(const char *model_name, struct model_info *model)
 			}
 		}
 
+		AGR_INFO("has_texture = %d", model->meshes[i].has_texture);
+
 		free(pos);
 		free(norms);
 		free(tc);
@@ -359,29 +343,6 @@ enum LOAD_STATUS load_model(const char *model_name, struct model_info *model)
 	center->x = (min->x + max->x) / 2.0f;
 	center->y = (min->y + max->y) / 2.0f;
 	center->z = (min->z + max->z) / 2.0f;
-/*
-	model->ntexts = scene->mNumTextures;
-	model->texts = malloc(sizeof(*model->texts) * model->ntexts);
-
-	for (i = 0; i < model->ntexts; i++) {
-		glGenTextures(1, &model->texts[i].id);
-
-		glBindTexture(GL_TEXTURE_2D, model->texts[i].id);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		struct aiTexture *tex = scene->mTextures[i];
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex->mWidth, tex->mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex->pcData);
-
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-*/
 
 	aiReleaseImport(scene);
 #ifndef NDEBUG

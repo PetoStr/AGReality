@@ -1,6 +1,5 @@
-package com.example.p.agreality;
+package com.example.p.agreality.logics;
 
-import com.example.p.agreality.logics.AbstractLogic;
 import com.example.p.engine.AGRenderer;
 
 import java.lang.reflect.Constructor;
@@ -31,6 +30,11 @@ public class LogicState {
 	private static class NullLogic implements SimpleLogic {
 		@Override
 		public void init() {
+
+		}
+
+		@Override
+		public void update(float frameTime) {
 
 		}
 
