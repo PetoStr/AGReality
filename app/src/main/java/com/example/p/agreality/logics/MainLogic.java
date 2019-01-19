@@ -38,8 +38,10 @@ public class MainLogic extends AbstractLogic  {
 
 	private CustomScene scene;
 
-	private List<ModeledEntity> modeledEntities = new ArrayList<>();
-	private List<ImageEntity> imgEntities = new ArrayList<>();
+	private List<ModeledEntity> modeledEntitiesToAdd = new ArrayList<>();
+	private List<ModeledEntity> modeledEntitiesToRemove = new ArrayList<>();
+
+	private List<ImageEntity> imgEntitiesToAdd = new ArrayList<>();
 
 	private List<ImageEntity> controlImgs = new ArrayList<>();
 	private List<ImageEntity> listImgs = new ArrayList<>();
@@ -62,42 +64,42 @@ public class MainLogic extends AbstractLogic  {
 		rotatePY.setPosition(new Vector3f(rMid.x - 3 * w / 2, rMid.y - h / 2, 0.0f));
 		rotatePY.setWidth(w);
 		rotatePY.setHeight(h);
-		addImageEntity(rotatePY);
+		scene.getImageEntities().add(rotatePY);
 		controlImgs.add(rotatePY);
 
 		ImageEntity rotateNY = new RotationButton(scene, Config.IMAGE_GRASS, new Vector3f(0.0f, -speed, 0.0f));
 		rotateNY.setPosition(new Vector3f(rMid.x + w / 2, rMid.y - h / 2, 0.0f));
 		rotateNY.setWidth(w);
 		rotateNY.setHeight(h);
-		addImageEntity(rotateNY);
+		scene.getImageEntities().add(rotateNY);
 		controlImgs.add(rotateNY);
 
 		ImageEntity rotatePX = new RotationButton(scene, Config.IMAGE_GRASS, new Vector3f(speed, 0.0f, 0.0f));
 		rotatePX.setPosition(new Vector3f(rMid.x - w / 2, rMid.y + h / 2, 0.0f));
 		rotatePX.setWidth(w);
 		rotatePX.setHeight(h);
-		addImageEntity(rotatePX);
+		scene.getImageEntities().add(rotatePX);
 		controlImgs.add(rotatePX);
 
 		ImageEntity rotateNX = new RotationButton(scene, Config.IMAGE_GRASS, new Vector3f(-speed, 0.0f, 0.0f));
 		rotateNX.setPosition(new Vector3f(rMid.x - w / 2, rMid.y - 3 * h / 2, 0.0f));
 		rotateNX.setWidth(w);
 		rotateNX.setHeight(h);
-		addImageEntity(rotateNX);
+		scene.getImageEntities().add(rotateNX);
 		controlImgs.add(rotateNX);
 
 		ImageEntity rotatePZ = new RotationButton(scene, Config.IMAGE_GRASS, new Vector3f(0.0f, 0.0f, speed));
 		rotatePZ.setPosition(new Vector3f(rMid.x + w / 2, rMid.y - 3 * h / 2, 0.0f));
 		rotatePZ.setWidth(w);
 		rotatePZ.setHeight(h);
-		addImageEntity(rotatePZ);
+		scene.getImageEntities().add(rotatePZ);
 		controlImgs.add(rotatePZ);
 
 		ImageEntity rotateNZ = new RotationButton(scene, Config.IMAGE_GRASS, new Vector3f(0.0f, 0.0f, -speed));
 		rotateNZ.setPosition(new Vector3f(rMid.x - 3 * w / 2, rMid.y - 3 * h / 2, 0.0f));
 		rotateNZ.setWidth(w);
 		rotateNZ.setHeight(h);
-		addImageEntity(rotateNZ);
+		scene.getImageEntities().add(rotateNZ);
 		controlImgs.add(rotateNZ);
 	}
 
@@ -112,42 +114,42 @@ public class MainLogic extends AbstractLogic  {
 		movePY.setPosition(new Vector3f(rMid.x + w / 2, rMid.y - 3 * h / 2, 0.0f));
 		movePY.setWidth(w);
 		movePY.setHeight(h);
-		addImageEntity(movePY);
+		scene.getImageEntities().add(movePY);
 		controlImgs.add(movePY);
 
 		ImageEntity moveNY = new MovementButton(scene, Config.IMAGE_MDOWN, new Vector3f(0.0f, -speed, 0.0f));
 		moveNY.setPosition(new Vector3f(rMid.x - 3 * w / 2, rMid.y - 3 * h / 2, 0.0f));
 		moveNY.setWidth(w);
 		moveNY.setHeight(h);
-		addImageEntity(moveNY);
+		scene.getImageEntities().add(moveNY);
 		controlImgs.add(moveNY);
 
 		ImageEntity movePX = new MovementButton(scene, Config.IMAGE_MLEFT, new Vector3f(speed, 0.0f, 0.0f));
 		movePX.setPosition(new Vector3f(rMid.x - 3 * w / 2, rMid.y - h / 2, 0.0f));
 		movePX.setWidth(w);
 		movePX.setHeight(h);
-		addImageEntity(movePX);
+		scene.getImageEntities().add(movePX);
 		controlImgs.add(movePX);
 
 		ImageEntity moveNX = new MovementButton(scene, Config.IMAGE_MRIGHT, new Vector3f(-speed, 0.0f, 0.0f));
 		moveNX.setPosition(new Vector3f(rMid.x + w / 2, rMid.y - h / 2, 0.0f));
 		moveNX.setWidth(w);
 		moveNX.setHeight(h);
-		addImageEntity(moveNX);
+		scene.getImageEntities().add(moveNX);
 		controlImgs.add(moveNX);
 
 		ImageEntity movePZ = new MovementButton(scene, Config.IMAGE_MFRONT, new Vector3f(0.0f, 0.0f, speed));
 		movePZ.setPosition(new Vector3f(rMid.x - w / 2, rMid.y + h / 2, 0.0f));
 		movePZ.setWidth(w);
 		movePZ.setHeight(h);
-		addImageEntity(movePZ);
+		scene.getImageEntities().add(movePZ);
 		controlImgs.add(movePZ);
 
 		ImageEntity moveNZ = new MovementButton(scene, Config.IMAGE_MBACK, new Vector3f(0.0f, 0.0f, -speed));
 		moveNZ.setPosition(new Vector3f(rMid.x - w / 2, rMid.y - 3 * h / 2, 0.0f));
 		moveNZ.setWidth(w);
 		moveNZ.setHeight(h);
-		addImageEntity(moveNZ);
+		scene.getImageEntities().add(moveNZ);
 		controlImgs.add(moveNZ);
 	}
 
@@ -165,7 +167,7 @@ public class MainLogic extends AbstractLogic  {
 		showList.setPosition(new Vector3f(posX, posY, 0.0f));
 		showList.setWidth(w);
 		showList.setHeight(h);
-		addImageEntity(showList);
+		scene.getImageEntities().add(showList);
 		controlImgs.add(showList);
 
 		showList.registerOnTouch(() -> {
@@ -186,14 +188,14 @@ public class MainLogic extends AbstractLogic  {
 		nanosuitElement.setWidth(w);
 		nanosuitElement.setHeight(h);
 		nanosuitElement.setVisible(false);
-		addImageEntity(nanosuitElement);
+		scene.getImageEntities().add(nanosuitElement);
 		listImgs.add(nanosuitElement);
 
 		nanosuitElement.registerOnTouch(() -> {
 			ModeledEntity nanosuit = new Nanosuit(scene);
 			Vector3f pos = getPositionInFrontOfCamera();
 			nanosuit.setPosition(pos);
-			addModeledEntity(nanosuit);
+			modeledEntitiesToAdd.add(nanosuit);
 
 			showControlImgs(true);
 			showListImgs(false);
@@ -206,14 +208,14 @@ public class MainLogic extends AbstractLogic  {
 		wraithElement.setWidth(w);
 		wraithElement.setHeight(h);
 		wraithElement.setVisible(false);
-		addImageEntity(wraithElement);
+		scene.getImageEntities().add(wraithElement);
 		listImgs.add(wraithElement);
 
 		wraithElement.registerOnTouch(() -> {
 			ModeledEntity wraith = new Wraith(scene);
 			Vector3f pos = getPositionInFrontOfCamera();
 			wraith.setPosition(pos);
-			addModeledEntity(wraith);
+			modeledEntitiesToAdd.add(wraith);
 
 			showControlImgs(true);
 			showListImgs(false);
@@ -226,14 +228,14 @@ public class MainLogic extends AbstractLogic  {
 		officeChairElement.setWidth(w);
 		officeChairElement.setHeight(h);
 		officeChairElement.setVisible(false);
-		addImageEntity(officeChairElement);
+		scene.getImageEntities().add(officeChairElement);
 		listImgs.add(officeChairElement);
 
 		officeChairElement.registerOnTouch(() -> {
 			ModeledEntity officeChair = new OfficeChair(scene);
 			Vector3f pos = getPositionInFrontOfCamera();
 			officeChair.setPosition(pos);
-			addModeledEntity(officeChair);
+			modeledEntitiesToAdd.add(officeChair);
 
 			showControlImgs(true);
 			showListImgs(false);
@@ -252,7 +254,7 @@ public class MainLogic extends AbstractLogic  {
 		hideList.setWidth(w);
 		hideList.setHeight(h);
 		hideList.setVisible(false);
-		addImageEntity(hideList);
+		scene.getImageEntities().add(hideList);
 		listImgs.add(hideList);
 
 		hideList.registerOnTouch(() -> {
@@ -277,10 +279,10 @@ public class MainLogic extends AbstractLogic  {
 		removeModel.setPosition(new Vector3f(posX, posY, 0.0f));
 		removeModel.setWidth(w);
 		removeModel.setHeight(h);
-		addImageEntity(removeModel);
+		scene.getImageEntities().add(removeModel);
 
 		removeModel.registerOnTouch(() -> {
-			scene.removeModeledEntity(scene.getSelectedModeledEntity());
+			modeledEntitiesToRemove.add(scene.getSelectedModeledEntity());
 		});
 
 		posX = Screen.getWidth() - posX - w;
@@ -290,7 +292,7 @@ public class MainLogic extends AbstractLogic  {
 		setDirLight.setPosition(new Vector3f(posX, posY, 0.0f));
 		setDirLight.setWidth(w);
 		setDirLight.setHeight(h);
-		addImageEntity(setDirLight);
+		scene.getImageEntities().add(setDirLight);
 	}
 
 	private void initScene() {
@@ -337,22 +339,12 @@ public class MainLogic extends AbstractLogic  {
 		}
 	}
 
-	private void addImageEntity(ImageEntity entity) {
-		imgEntities.add(entity);
-		scene.addImageEntity(entity);
-	}
-
 	private Vector3f getPositionInFrontOfCamera() {
 		float[] vMatrix = scene.getCamera().getViewMatrix();
 		Vector3f camDir = new Vector3f(-vMatrix[2], -vMatrix[6], -vMatrix[10]);
 		Vector3f camPos = scene.getCamera().getPosition();
 
 		return new Vector3f(camDir).mul(30.0f).add(camPos);
-	}
-
-	private void addModeledEntity(ModeledEntity entity) {
-		modeledEntities.add(entity);
-		scene.addModeledEntity(entity);
 	}
 
 	private float getCameraRotation() {
@@ -372,6 +364,21 @@ public class MainLogic extends AbstractLogic  {
 	@Override
 	public void update(float frameTime) {
 		scene.updateAll(frameTime);
+
+		if (!modeledEntitiesToAdd.isEmpty()) {
+			scene.getModeledEntities().addAll(modeledEntitiesToAdd);
+			modeledEntitiesToAdd.clear();
+		}
+
+		if (!modeledEntitiesToRemove.isEmpty()) {
+			scene.getModeledEntities().removeAll(modeledEntitiesToRemove);
+			modeledEntitiesToRemove.clear();
+		}
+
+		if (!imgEntitiesToAdd.isEmpty()) {
+			scene.getImageEntities().addAll(imgEntitiesToAdd);
+			imgEntitiesToAdd.clear();
+		}
 	}
 
 	@Override
@@ -414,11 +421,11 @@ public class MainLogic extends AbstractLogic  {
 		switch (action) {
 			case MotionEvent.ACTION_DOWN:
 			case MotionEvent.ACTION_POINTER_DOWN:
-				ImageEntity e = TouchPicker.handleScreenTouchedEntity(imgEntities, x, y);
+				ImageEntity e = TouchPicker.handleScreenTouchedEntity(scene.getImageEntities(), x, y);
 				e.setSelected(true);
 
 				if (e instanceof NullImageEntity) {
-					ModeledEntity m = TouchPicker.handleWorldTouchedEntity(modeledEntities, scene.getCamera(), x, y);
+					ModeledEntity m = TouchPicker.handleWorldTouchedEntity(scene.getModeledEntities(), scene.getCamera(), x, y);
 
 					scene.getSelectedModeledEntity().setSelected(false);
 					scene.setSelectedModeledEntity(m);
@@ -434,6 +441,13 @@ public class MainLogic extends AbstractLogic  {
 					e0.setSelected(false);
 					scene.getSelectedImageEntities().remove(pointerId);
 				}
+				break;
+			case MotionEvent.ACTION_CANCEL:
+				for (int i = 0; i < scene.getSelectedImageEntities().size(); i++) {
+					ImageEntity img = scene.getSelectedImageEntities().valueAt(i);
+					img.setSelected(false);
+				}
+				scene.getSelectedImageEntities().clear();
 				break;
 		}
 	}

@@ -9,7 +9,6 @@ import java.util.List;
 public class Scene {
 
 	private List<ModeledEntity> modeledEntities = new ArrayList<>();
-	private List<ModeledEntity> modeledEntitiesToRemove = new ArrayList<>();
 
 	private List<ImageEntity> imageEntities = new ArrayList<>();
 	private List<ImageEntity> imageEntitiesToRemove = new ArrayList<>();
@@ -28,28 +27,6 @@ public class Scene {
 			entity.tick(frameTime);
 			entity.updateModelMatrix();
 		}
-
-		if (modeledEntitiesToRemove.size() != 0) {
-			modeledEntities.removeAll(modeledEntitiesToRemove);
-			modeledEntitiesToRemove.clear();
-		}
-
-		if (imageEntitiesToRemove.size() != 0) {
-			imageEntities.removeAll(imageEntitiesToRemove);
-			imageEntitiesToRemove.clear();
-		}
-	}
-
-	public void addModeledEntity(ModeledEntity entity) {
-		modeledEntities.add(entity);
-	}
-
-	public void addImageEntity(ImageEntity entity) {
-		imageEntities.add(entity);
-	}
-
-	public void removeModeledEntity(ModeledEntity entity) {
-		modeledEntitiesToRemove.add(entity);
 	}
 
 	public void setCamera(Camera camera) {
