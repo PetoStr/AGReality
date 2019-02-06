@@ -30,11 +30,11 @@ public class LoadingLogic extends AbstractLogic {
 	public LoadingLogic(LogicState logicState) {
 		super(logicState);
 
-		fillList();
+		fillLoadingQueue();
 		entityToLoad = entitiesToLoad.poll();
 	}
 
-	private void fillList() {
+	private void fillLoadingQueue() {
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_GRASS));
 
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_MUP));
@@ -43,6 +43,12 @@ public class LoadingLogic extends AbstractLogic {
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_MRIGHT));
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_MFRONT));
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_MBACK));
+		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_RPX));
+		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_RNX));
+		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_RPY));
+		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_RNY));
+		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_RPZ));
+		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_RNZ));
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_PLUS));
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_X));
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_REMOVE));
@@ -52,7 +58,7 @@ public class LoadingLogic extends AbstractLogic {
 		entitiesToLoad.add(Pair.create(ModeledEntity.class, Config.MODEL_OFFICE_CHAIR));
 	}
 
-	private void load(Pair<Class<? extends Entity>, String> toLoad) {
+	private static void load(Pair<Class<? extends Entity>, String> toLoad) {
 		try {
 			Constructor<? extends Entity> constructor = toLoad.first.getConstructor(Scene.class, String.class);
 			constructor.newInstance(null, toLoad.second);

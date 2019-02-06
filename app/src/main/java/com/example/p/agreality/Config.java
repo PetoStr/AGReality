@@ -7,19 +7,31 @@ public final class Config {
 
 	public static final float FLOATING_SPEED = 2.0f;
 
+
 	public static final String MODELS_PATH = "models/";
 	public static final String MODEL_WRAITH = MODELS_PATH + "wraith/Wraith_Raider_Starship.obj";
 	public static final String MODEL_NANOSUIT = MODELS_PATH + "nanosuit/nanosuit.obj";
 	public static final String MODEL_OFFICE_CHAIR = MODELS_PATH + "office_chair/office_chair.obj";
 
+
 	public static final String IMAGES_PATH = "imgs/";
+
 	public static final String IMAGE_GRASS = IMAGES_PATH  + "grass.png";
+
 	public static final String IMAGE_MUP = IMAGES_PATH + "mup.png";
 	public static final String IMAGE_MDOWN = IMAGES_PATH + "mdown.png";
 	public static final String IMAGE_MLEFT = IMAGES_PATH + "mleft.png";
 	public static final String IMAGE_MRIGHT = IMAGES_PATH + "mright.png";
 	public static final String IMAGE_MFRONT = IMAGES_PATH + "mforward.png";
 	public static final String IMAGE_MBACK = IMAGES_PATH + "mbackward.png";
+
+	public static final String IMAGE_RPX = IMAGES_PATH + "rpx.png";
+	public static final String IMAGE_RNX = IMAGES_PATH + "rnx.png";
+	public static final String IMAGE_RPY = IMAGES_PATH + "rpy.png";
+	public static final String IMAGE_RNY = IMAGES_PATH + "rny.png";
+	public static final String IMAGE_RPZ = IMAGES_PATH + "rpz.png";
+	public static final String IMAGE_RNZ = IMAGES_PATH + "rnz.png";
+
 	public static final String IMAGE_PLUS = IMAGES_PATH + "plus.png";
 	public static final String IMAGE_X = IMAGES_PATH + "x.png";
 	public static final String IMAGE_REMOVE = IMAGES_PATH + "remove.png";

@@ -60,42 +60,42 @@ public class MainLogic extends AbstractLogic  {
 		Vector2f rMid = new Vector2f(Screen.getWidth() - 5 * w / 3, 5 * h / 3);
 		float speed = Config.ROTATION_SPEED;
 
-		ImageEntity rotatePY = new RotationButton(scene, Config.IMAGE_GRASS, new Vector3f(0.0f, speed, 0.0f));
-		rotatePY.setPosition(new Vector3f(rMid.x - 3 * w / 2, rMid.y - h / 2, 0.0f));
-		rotatePY.setWidth(w);
-		rotatePY.setHeight(h);
-		scene.getImageEntities().add(rotatePY);
-		controlImgs.add(rotatePY);
-
-		ImageEntity rotateNY = new RotationButton(scene, Config.IMAGE_GRASS, new Vector3f(0.0f, -speed, 0.0f));
-		rotateNY.setPosition(new Vector3f(rMid.x + w / 2, rMid.y - h / 2, 0.0f));
-		rotateNY.setWidth(w);
-		rotateNY.setHeight(h);
-		scene.getImageEntities().add(rotateNY);
-		controlImgs.add(rotateNY);
-
-		ImageEntity rotatePX = new RotationButton(scene, Config.IMAGE_GRASS, new Vector3f(speed, 0.0f, 0.0f));
+		ImageEntity rotatePX = new RotationButton(scene, Config.IMAGE_RPX, new Vector3f(speed, 0.0f, 0.0f));
 		rotatePX.setPosition(new Vector3f(rMid.x - w / 2, rMid.y + h / 2, 0.0f));
 		rotatePX.setWidth(w);
 		rotatePX.setHeight(h);
 		scene.getImageEntities().add(rotatePX);
 		controlImgs.add(rotatePX);
 
-		ImageEntity rotateNX = new RotationButton(scene, Config.IMAGE_GRASS, new Vector3f(-speed, 0.0f, 0.0f));
+		ImageEntity rotateNX = new RotationButton(scene, Config.IMAGE_RNX, new Vector3f(-speed, 0.0f, 0.0f));
 		rotateNX.setPosition(new Vector3f(rMid.x - w / 2, rMid.y - 3 * h / 2, 0.0f));
 		rotateNX.setWidth(w);
 		rotateNX.setHeight(h);
 		scene.getImageEntities().add(rotateNX);
 		controlImgs.add(rotateNX);
 
-		ImageEntity rotatePZ = new RotationButton(scene, Config.IMAGE_GRASS, new Vector3f(0.0f, 0.0f, speed));
+		ImageEntity rotatePY = new RotationButton(scene, Config.IMAGE_RPY, new Vector3f(0.0f, speed, 0.0f));
+		rotatePY.setPosition(new Vector3f(rMid.x - 3 * w / 2, rMid.y - h / 2, 0.0f));
+		rotatePY.setWidth(w);
+		rotatePY.setHeight(h);
+		scene.getImageEntities().add(rotatePY);
+		controlImgs.add(rotatePY);
+
+		ImageEntity rotateNY = new RotationButton(scene, Config.IMAGE_RNY, new Vector3f(0.0f, -speed, 0.0f));
+		rotateNY.setPosition(new Vector3f(rMid.x + w / 2, rMid.y - h / 2, 0.0f));
+		rotateNY.setWidth(w);
+		rotateNY.setHeight(h);
+		scene.getImageEntities().add(rotateNY);
+		controlImgs.add(rotateNY);
+
+		ImageEntity rotatePZ = new RotationButton(scene, Config.IMAGE_RPZ, new Vector3f(0.0f, 0.0f, speed));
 		rotatePZ.setPosition(new Vector3f(rMid.x + w / 2, rMid.y - 3 * h / 2, 0.0f));
 		rotatePZ.setWidth(w);
 		rotatePZ.setHeight(h);
 		scene.getImageEntities().add(rotatePZ);
 		controlImgs.add(rotatePZ);
 
-		ImageEntity rotateNZ = new RotationButton(scene, Config.IMAGE_GRASS, new Vector3f(0.0f, 0.0f, -speed));
+		ImageEntity rotateNZ = new RotationButton(scene, Config.IMAGE_RNZ, new Vector3f(0.0f, 0.0f, -speed));
 		rotateNZ.setPosition(new Vector3f(rMid.x - 3 * w / 2, rMid.y - 3 * h / 2, 0.0f));
 		rotateNZ.setWidth(w);
 		rotateNZ.setHeight(h);
