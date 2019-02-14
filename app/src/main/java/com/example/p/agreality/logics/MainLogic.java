@@ -12,7 +12,7 @@ import com.example.p.agreality.entities.imgs.SimpleButton;
 import com.example.p.agreality.entities.imgs.control.MovementButton;
 import com.example.p.agreality.entities.imgs.control.RotationButton;
 import com.example.p.agreality.entities.imgs.SetDirLightButton;
-import com.example.p.agreality.entities.models.Nanosuit;
+import com.example.p.agreality.entities.models.Earth;
 import com.example.p.agreality.entities.models.OfficeChair;
 import com.example.p.agreality.entities.models.Wraith;
 import com.example.p.engine.util.TouchPicker;
@@ -183,19 +183,19 @@ public class MainLogic extends AbstractLogic  {
 		float posX = 5 * w / 3;
 		float posY = 5 * h / 3;
 
-		ImageEntity nanosuitElement = new SimpleButton(scene, Config.IMAGE_GRASS);
-		nanosuitElement.setPosition(new Vector3f(posX, posY, 0.0f));
-		nanosuitElement.setWidth(w);
-		nanosuitElement.setHeight(h);
-		nanosuitElement.setVisible(false);
-		scene.getImageEntities().add(nanosuitElement);
-		listImgs.add(nanosuitElement);
+		ImageEntity earthElement = new SimpleButton(scene, Config.IMAGE_EARTH);
+		earthElement.setPosition(new Vector3f(posX, posY, 0.0f));
+		earthElement.setWidth(w);
+		earthElement.setHeight(h);
+		earthElement.setVisible(false);
+		scene.getImageEntities().add(earthElement);
+		listImgs.add(earthElement);
 
-		nanosuitElement.registerOnTouch(() -> {
-			ModeledEntity nanosuit = new Nanosuit(scene);
+		earthElement.registerOnTouch(() -> {
+			ModeledEntity earth = new Earth(scene);
 			Vector3f pos = getPositionInFrontOfCamera();
-			nanosuit.setPosition(pos);
-			modeledEntitiesToAdd.add(nanosuit);
+			earth.setPosition(pos);
+			modeledEntitiesToAdd.add(earth);
 
 			showControlImgs(true);
 			showListImgs(false);
@@ -203,7 +203,7 @@ public class MainLogic extends AbstractLogic  {
 
 		posX += 2.0f * w;
 
-		ImageEntity wraithElement = new SimpleButton(scene, Config.IMAGE_GRASS);
+		ImageEntity wraithElement = new SimpleButton(scene, Config.IMAGE_WRAITH);
 		wraithElement.setPosition(new Vector3f(posX, posY, 0.0f));
 		wraithElement.setWidth(w);
 		wraithElement.setHeight(h);
@@ -223,7 +223,7 @@ public class MainLogic extends AbstractLogic  {
 
 		posX += 2.0f * w;
 
-		ImageEntity officeChairElement = new SimpleButton(scene, Config.IMAGE_GRASS);
+		ImageEntity officeChairElement = new SimpleButton(scene, Config.IMAGE_OFFICE_CHAIR);
 		officeChairElement.setPosition(new Vector3f(posX, posY, 0.0f));
 		officeChairElement.setWidth(w);
 		officeChairElement.setHeight(h);
@@ -299,6 +299,10 @@ public class MainLogic extends AbstractLogic  {
 		scene = new CustomScene();
 
 		scene.setSelectedModeledEntity(new NullModelEntity());
+
+		/*ModeledEntity wolf = new ModeledEntity(scene, Config.MODEL_WOLF);
+		wolf.setPosition(new Vector3f(0.0f, -10.0f, 35.0f));
+		scene.getModeledEntities().add(wolf);*/
 
 		/*ModeledEntity nanosuit = new Nanosuit(scene);
 		nanosuit.setPosition(new Vector3f(0.0f, -10.0f, 35.0f));

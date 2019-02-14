@@ -13,6 +13,9 @@ in vec3 f_pos;
 out vec4 out_color;
 
 uniform int has_texture;
+uniform vec4 dcolor;
+uniform vec4 scolor;
+uniform float opacity;
 
 uniform bool selected;
 
@@ -35,14 +38,14 @@ vec4 calc_light_color(vec3 light_dir, vec3 norm, vec3 dc, vec3 sc, vec3 pos)
 	vec3 ambient = ambient_intensity * dc;
 
 	float diff = max(dot(norm, light_dir), 0.0);
-	vec3 diffuse = 0.1 * diff * dc;
+	vec3 diffuse = diff * dc;
 
 	vec3 view_dir = normalize(view_pos - pos);
 	vec3 reflect_dir = reflect(-light_dir, norm);
 	float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 8.0);
 	vec3 specular = 0.1 * spec * sc;
 
-	return vec4(ambient + diffuse + specular, 1.0);
+	return vec4(ambient + diffuse + specular, opacity);
 }
 
 void main(void)
@@ -58,16 +61,16 @@ void main(void)
 	if ((has_texture & DIFFUSE_TMAP_MASK) != 0) {
 		dc = texture(texture_diffuse, f_uv);
 	} else {
-		dc = vec4(0.1, 0.1, 0.1, 1.0);
+		dc = dcolor;
 	}
 
 	if ((has_texture & SPECULAR_TMAP_MASK) != 0) {
 		sc = texture(texture_specular, f_uv);
 	} else {
-		sc = vec4(0.0, 0.0, 0.0, 1.0);
+		sc = scolor;
 	}
 
-	norm = f_norm;
+	norm = normalize(f_norm);
 
 	out_color = calc_light_color(dlight_dir, norm, dc.rgb, sc.rgb, f_pos);
 }

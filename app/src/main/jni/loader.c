@@ -17,6 +17,7 @@
 #include "assimpio.h"
 #include "jni_helper.h"
 #include "scene.h"
+#include "util.h"
 
 #define UNKNOWN_TMAP_MASK 0x01
 #define DIFFUSE_TMAP_MASK 0x02
@@ -197,6 +198,7 @@ static void load_material_textures(struct aiMaterial *material,
 			mesh->texts[curr] = *tex;
 			mesh->texts[curr].is_copy = 1;
 		} else {
+			fix_path_slashes(fname);
 			mesh->texts[curr] = create_texture(fname,
 				type_name);
 			mesh->texts[curr].is_copy = 0;
@@ -331,6 +333,34 @@ enum LOAD_STATUS load_model(const char *model_name, struct model_info *model)
 					 textures, textures != 1 ? "s " : " ", r);
 			}
 		}
+
+		if (!(model->meshes[i].has_texture & DIFFUSE_TMAP_MASK)) {
+			struct aiColor4D diff;
+			int res = aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diff);
+			if (res == AI_SUCCESS) {
+				model->meshes[i].dcolor[0] = diff.r;
+				model->meshes[i].dcolor[1] = diff.g;
+				model->meshes[i].dcolor[2] = diff.b;
+				model->meshes[i].dcolor[3] = diff.a;
+			}
+		} else if (!(model->meshes[i].has_texture & SPECULAR_TMAP_MASK)) {
+			struct aiColor4D spec;
+			int res = aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &spec);
+			if (res == AI_SUCCESS) {
+				model->meshes[i].scolor[0] = spec.r;
+				model->meshes[i].scolor[1] = spec.g;
+				model->meshes[i].scolor[2] = spec.b;
+				model->meshes[i].scolor[3] = spec.a;
+			}
+		}
+
+		float op = 1.0f;
+		struct aiColor4D opac;
+		if (aiGetMaterialColor(material, AI_MATKEY_OPACITY, &opac) == AI_SUCCESS) {
+			op = opac.r;
+		}
+
+		model->meshes[i].opacity = op;
 
 		AGR_INFO("has_texture = %d", model->meshes[i].has_texture);
 

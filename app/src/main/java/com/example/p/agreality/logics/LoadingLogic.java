@@ -52,8 +52,11 @@ public class LoadingLogic extends AbstractLogic {
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_PLUS));
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_X));
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_REMOVE));
+		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_EARTH));
+		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_WRAITH));
+		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_OFFICE_CHAIR));
 
-		entitiesToLoad.add(Pair.create(ModeledEntity.class, Config.MODEL_NANOSUIT));
+		entitiesToLoad.add(Pair.create(ModeledEntity.class, Config.MODEL_EARTH));
 		entitiesToLoad.add(Pair.create(ModeledEntity.class, Config.MODEL_WRAITH));
 		entitiesToLoad.add(Pair.create(ModeledEntity.class, Config.MODEL_OFFICE_CHAIR));
 	}

@@ -28,9 +28,12 @@ static const int mmatrix_loc = 0;
 static const int vmatrix_loc = 1;
 static const int pmatrix_loc = 2;
 static const int has_texture_loc = 3;
-static const int selected_loc = 4;
-static const int view_pos_loc = 5;
-static const int dlight_dir_loc = 6;
+static const int dcolor_loc = 4;
+static const int scolor_loc = 5;
+static const int opacity_loc = 6;
+static const int selected_loc = 7;
+static const int view_pos_loc = 8;
+static const int dlight_dir_loc = 9;
 
 static float dlight_dir[] = { 0.0f, 0.0f, -1.0f };
 
@@ -89,6 +92,12 @@ Java_com_example_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
 	check_gl_error("glGetUniformLocation> PMatrix");
 	program.uflocs[has_texture_loc] = glGetUniformLocation(program.id, "has_texture");
 	check_gl_error("glGetUniformLocation> has_texture");
+	program.uflocs[dcolor_loc] = glGetUniformLocation(program.id, "dcolor");
+	check_gl_error("glGetUniformLocation> dcolor");
+	program.uflocs[scolor_loc] = glGetUniformLocation(program.id, "scolor");
+	check_gl_error("glGetUniformLocation> scolor");
+	program.uflocs[opacity_loc] = glGetUniformLocation(program.id, "opacity");
+	check_gl_error("glGetUniformLocation> opacity");
 	program.uflocs[selected_loc] = glGetUniformLocation(program.id, "selected");
 	check_gl_error("glGetUniformLocation> selected");
 	program.uflocs[view_pos_loc] = glGetUniformLocation(program.id, "view_pos");
@@ -255,6 +264,12 @@ static void draw_model(struct model_info *model)
 
 		glUniform1i(program.uflocs[has_texture_loc], mesh->has_texture);
 		check_gl_error("glUniform1i");
+		glUniform4fv(program.uflocs[dcolor_loc], 1, mesh->dcolor);
+		check_gl_error("glUniform4fv");
+		glUniform4fv(program.uflocs[scolor_loc], 1, mesh->scolor);
+		check_gl_error("glUniform4fv");
+		glUniform1f(program.uflocs[opacity_loc], mesh->opacity);
+		check_gl_error("glUniform1f");
 
 		render_mesh(program.id, mesh);
 	}

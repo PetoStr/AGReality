@@ -5,13 +5,21 @@ public final class Config {
 	public static final float MOVE_SPEED = 9.0f;
 	public static final float ROTATION_SPEED = (float) (Math.PI / 2.0f);
 
+	public static final long RELEASE_WAIT_TIME_NS = 1000000000;
+
 	public static final float FLOATING_SPEED = 2.0f;
 
+	public static final float EARTH_ROTATION_SPEED = (float) (Math.PI / 8.0f);
+	public static final float EARTH_SCALE = 0.005f;
+
+	public static final float WRAITH_SCALE = 0.03f;
+
+	public static final float OFFICE_CHAIR_SCALE = 4.0f;
 
 	public static final String MODELS_PATH = "models/";
 	public static final String MODEL_WRAITH = MODELS_PATH + "wraith/Wraith_Raider_Starship.obj";
-	public static final String MODEL_NANOSUIT = MODELS_PATH + "nanosuit/nanosuit.obj";
 	public static final String MODEL_OFFICE_CHAIR = MODELS_PATH + "office_chair/office_chair.obj";
+	public static final String MODEL_EARTH = MODELS_PATH + "earth/earth.obj"; // https://free3d.com/3d-model/earth-v1--590680.html
 
 
 	public static final String IMAGES_PATH = "imgs/";
@@ -36,6 +44,10 @@ public final class Config {
 	public static final String IMAGE_X = IMAGES_PATH + "x.png";
 	public static final String IMAGE_REMOVE = IMAGES_PATH + "remove.png";
 	public static final String IMAGE_LIGHT_BULB_DIR = IMAGES_PATH + "lbulb_dir.png";
+
+	public static final String IMAGE_EARTH = IMAGES_PATH + "earth.jpg";
+	public static final String IMAGE_WRAITH = IMAGES_PATH + "wraith.png";
+	public static final String IMAGE_OFFICE_CHAIR = IMAGES_PATH + "office_chair.png";
 
 	private Config() {
 

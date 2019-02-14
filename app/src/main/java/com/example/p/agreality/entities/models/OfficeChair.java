@@ -10,7 +10,7 @@ public class OfficeChair extends ModeledEntity {
 
 	public OfficeChair(CustomScene scene) {
 		super(scene, Config.MODEL_OFFICE_CHAIR);
-		setScale(new Vector3f(4.0f));
+		setScale(new Vector3f(Config.OFFICE_CHAIR_SCALE));
 	}
 
 }

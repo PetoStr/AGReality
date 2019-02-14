@@ -24,4 +24,14 @@
 
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 
+static inline void fix_path_slashes(char *path) {
+	char *c = path;
+	while (*c) {
+		if (*c == '\\') {
+			*c = '/';
+		}
+		c++;
+	}
+}
+
 #endif

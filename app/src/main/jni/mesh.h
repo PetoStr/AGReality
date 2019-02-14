@@ -16,6 +16,10 @@ struct mesh_info {
 	struct texture_info *texts;
 	int ntexts;
 
+	float dcolor[4];
+	float scolor[4];
+	float opacity;
+
 	int has_texture;
 };
 
