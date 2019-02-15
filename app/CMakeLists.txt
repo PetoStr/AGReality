@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-add_compile_options()#-Wall -Werror -Wextra -Wno-unused-parameter -Wno-gnu-zero-variadic-macro-arguments)# -pedantic)
+add_compile_options(-Wall -Werror -Wextra -Wno-unused-parameter -Wno-gnu-zero-variadic-macro-arguments)# -pedantic)
 
 add_library(
         native-lib

@@ -14,12 +14,16 @@ public final class Config {
 
 	public static final float WRAITH_SCALE = 0.03f;
 
-	public static final float OFFICE_CHAIR_SCALE = 4.0f;
+	public static final float OFFICE_CHAIR_SCALE = 2.5f;
+
+	public static final float ROOM_SCALE = 5.0f;
 
 	public static final String MODELS_PATH = "models/";
 	public static final String MODEL_WRAITH = MODELS_PATH + "wraith/Wraith_Raider_Starship.obj";
 	public static final String MODEL_OFFICE_CHAIR = MODELS_PATH + "office_chair/office_chair.obj";
 	public static final String MODEL_EARTH = MODELS_PATH + "earth/earth.obj"; // https://free3d.com/3d-model/earth-v1--590680.html
+	public static final String MODEL_TABLE = MODELS_PATH + "table/Table.obj"; // https://free3d.com/3d-model/table-89907.html
+	public static final String MODEL_ROOM = MODELS_PATH + "room/room.obj"; // https://free3d.com/3d-model/room-48457.html
 
 
 	public static final String IMAGES_PATH = "imgs/";
@@ -48,6 +52,8 @@ public final class Config {
 	public static final String IMAGE_EARTH = IMAGES_PATH + "earth.jpg";
 	public static final String IMAGE_WRAITH = IMAGES_PATH + "wraith.png";
 	public static final String IMAGE_OFFICE_CHAIR = IMAGES_PATH + "office_chair.png";
+	public static final String IMAGE_TABLE = IMAGES_PATH + "table.png";
+	public static final String IMAGE_ROOM = IMAGES_PATH + "room.png";
 
 	private Config() {
 

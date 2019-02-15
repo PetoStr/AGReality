@@ -14,6 +14,8 @@ import com.example.p.agreality.entities.imgs.control.RotationButton;
 import com.example.p.agreality.entities.imgs.SetDirLightButton;
 import com.example.p.agreality.entities.models.Earth;
 import com.example.p.agreality.entities.models.OfficeChair;
+import com.example.p.agreality.entities.models.Room;
+import com.example.p.agreality.entities.models.Table;
 import com.example.p.agreality.entities.models.Wraith;
 import com.example.p.engine.util.TouchPicker;
 import com.example.p.engine.entities.NullImageEntity;
@@ -236,6 +238,44 @@ public class MainLogic extends AbstractLogic  {
 			Vector3f pos = getPositionInFrontOfCamera();
 			officeChair.setPosition(pos);
 			modeledEntitiesToAdd.add(officeChair);
+
+			showControlImgs(true);
+			showListImgs(false);
+		});
+
+		posY += 2.0f * h;
+
+		ImageEntity tableElement = new SimpleButton(scene, Config.IMAGE_TABLE);
+		tableElement.setPosition(new Vector3f(posX, posY, 0.0f));
+		tableElement.setWidth(w);
+		tableElement.setHeight(h);
+		tableElement.setVisible(false);
+		scene.getImageEntities().add(tableElement);
+		listImgs.add(tableElement);
+
+		tableElement.registerOnTouch(() -> {
+			ModeledEntity table = new Table(scene);
+			Vector3f pos = getPositionInFrontOfCamera();
+			table.setPosition(pos);
+			modeledEntitiesToAdd.add(table);
+
+			showControlImgs(true);
+			showListImgs(false);
+		});
+
+		posX -= 2.0f * w;
+
+		ImageEntity roomElement = new SimpleButton(scene, Config.IMAGE_ROOM);
+		roomElement.setPosition(new Vector3f(posX, posY, 0.0f));
+		roomElement.setWidth(w);
+		roomElement.setHeight(h);
+		roomElement.setVisible(false);
+		scene.getImageEntities().add(roomElement);
+		listImgs.add(roomElement);
+
+		roomElement.registerOnTouch(() -> {
+			ModeledEntity table = new Room(scene);
+			modeledEntitiesToAdd.add(table);
 
 			showControlImgs(true);
 			showListImgs(false);

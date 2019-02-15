@@ -60,6 +60,9 @@ aiFileSeek custom_seek(C_STRUCT aiFile *file,
 			break;
 		case aiOrigin_SET:
 			fi->pos = offset;
+			break;
+		case _AI_ORIGIN_ENFORCE_ENUM_SIZE:
+			break;
 	}
 
 	off_t ret = AAsset_seek(fi->aasset, offset, whence);
