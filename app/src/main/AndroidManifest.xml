@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.p.agreality">
+    package="com.petostr.p.agreality">
 
     <uses-feature android:glEsVersion="0x00030000" android:required="true" />
     <uses-feature android:name="android.hardware.camera2.full" android:required="true" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <!-- TODO is "android.permission.READ_EXTERNAL_STORAGE" required?-->
 
     <application
         android:allowBackup="true"
@@ -16,8 +15,8 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar.Fullscreen"
         android:largeHeap="true"
-        android:name="com.example.p.engine.App" >
-        <activity android:name="com.example.p.engine.MainActivity" android:configChanges="orientation|keyboard|keyboardHidden|screenLayout|uiMode|screenSize|smallestScreenSize">
+        android:name="com.petostr.p.engine.App" >
+        <activity android:name="com.petostr.p.engine.MainActivity" android:configChanges="orientation|keyboard|keyboardHidden|screenLayout|uiMode|screenSize|smallestScreenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
