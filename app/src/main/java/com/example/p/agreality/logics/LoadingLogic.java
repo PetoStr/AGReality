@@ -6,6 +6,7 @@ import com.example.p.agreality.Config;
 import com.example.p.engine.AGRenderer;
 import com.example.p.engine.MainActivity;
 import com.example.p.engine.Scene;
+import com.example.p.engine.Screen;
 import com.example.p.engine.entities.Entity;
 import com.example.p.engine.entities.ImageEntity;
 import com.example.p.engine.entities.ModeledEntity;
@@ -66,10 +67,14 @@ public class LoadingLogic extends AbstractLogic {
 	}
 
 	private static void load(Pair<Class<? extends Entity>, String> toLoad) {
+		Constructor<? extends Entity> constructor;
 		try {
-			Constructor<? extends Entity> constructor = toLoad.first.getConstructor(Scene.class, String.class);
+			constructor = toLoad.first.getConstructor(Scene.class, String.class);
 			constructor.newInstance(null, toLoad.second);
-		} catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+		} catch (NoSuchMethodException
+				| IllegalAccessException
+				| InstantiationException
+				| InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
@@ -113,7 +118,8 @@ public class LoadingLogic extends AbstractLogic {
 		renderer.clear();
 
 		String text = "loading " + entityToLoad.second;
-		renderer.draw_text(text, 33.0f, 33.0f, 1.0f, textColor);
+		float scale = Screen.getWidth() / 1000.0f;
+		renderer.draw_text(text, 33.0f, 33.0f, scale, textColor);
 
 		framesRendered++;
 

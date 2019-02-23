@@ -2,10 +2,10 @@ package com.example.p.engine.entities;
 
 public class Resource {
 
-	public static final int TYPE_MODEL = 0;
-	public static final int TYPE_TEXTURE = 1;
+	static final int TYPE_MODEL = 0;
+	static final int TYPE_TEXTURE = 1;
 
-	public static final int PATH_MAX_LEN = 63;
+	private static final int PATH_MAX_LEN = 63;
 
 	private String path;
 

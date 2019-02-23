@@ -1,15 +1,15 @@
-
 #include <stdlib.h>
 #include <string.h>
 
 #include <android/asset_manager_jni.h>
 #include <jni.h>
 
+#include <linmath.h>
+
 #include "agrlog.h"
 #include "assimpio.h"
 #include "img_renderer.h"
 #include "jni_helper.h"
-#include "linmath.h"
 #include "loader.h"
 #include "model.h"
 #include "pv_matrices.h"
@@ -53,6 +53,8 @@ JNIEXPORT void JNICALL
 Java_com_example_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
 					  jobject assetManager)
 {
+	UNUSED(instance);
+
 	asset_manager = AAssetManager_fromJava(env, assetManager);
 	assimpio_init();
 
@@ -61,15 +63,13 @@ Java_com_example_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
 	AGR_INFO("GL_VENDOR: %s", glGetString(GL_VENDOR));
 	AGR_INFO("GL_RENDERER: %s", glGetString(GL_RENDERER));
 	AGR_INFO("GL_VERSION: %s", glGetString(GL_VERSION));
-	AGR_INFO("GL_SHADING_LANGUAGE_VERSION: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	AGR_INFO("GL_SHADING_LANGUAGE_VERSION: %s",
+		 glGetString(GL_SHADING_LANGUAGE_VERSION));
 	AGR_INFO("GL_EXTENSIONS: %s", glGetString(GL_EXTENSIONS));
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	/*glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
-	glFrontFace(GL_CW);*/
 
 	const int atbs_len = 4;
 	struct shader_attrib atbs[atbs_len] = {
@@ -84,25 +84,35 @@ Java_com_example_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
 	create_program(&program, atbs, atbs_len);
 	check_gl_error("create_program");
 
-	program.uflocs[mmatrix_loc] = glGetUniformLocation(program.id, "MMatrix");
+	program.uflocs[mmatrix_loc] =
+		glGetUniformLocation(program.id, "MMatrix");
 	check_gl_error("glGetUniformLocation> MMatrix");
-	program.uflocs[vmatrix_loc] = glGetUniformLocation(program.id, "VMatrix");
+	program.uflocs[vmatrix_loc] =
+		glGetUniformLocation(program.id, "VMatrix");
 	check_gl_error("glGetUniformLocation> VMatrix");
-	program.uflocs[pmatrix_loc] = glGetUniformLocation(program.id, "PMatrix");
+	program.uflocs[pmatrix_loc] =
+		glGetUniformLocation(program.id, "PMatrix");
 	check_gl_error("glGetUniformLocation> PMatrix");
-	program.uflocs[has_texture_loc] = glGetUniformLocation(program.id, "has_texture");
+	program.uflocs[has_texture_loc] =
+		glGetUniformLocation(program.id, "has_texture");
 	check_gl_error("glGetUniformLocation> has_texture");
-	program.uflocs[dcolor_loc] = glGetUniformLocation(program.id, "dcolor");
+	program.uflocs[dcolor_loc] =
+		glGetUniformLocation(program.id, "dcolor");
 	check_gl_error("glGetUniformLocation> dcolor");
-	program.uflocs[scolor_loc] = glGetUniformLocation(program.id, "scolor");
+	program.uflocs[scolor_loc] =
+		glGetUniformLocation(program.id, "scolor");
 	check_gl_error("glGetUniformLocation> scolor");
-	program.uflocs[opacity_loc] = glGetUniformLocation(program.id, "opacity");
+	program.uflocs[opacity_loc] =
+		glGetUniformLocation(program.id, "opacity");
 	check_gl_error("glGetUniformLocation> opacity");
-	program.uflocs[selected_loc] = glGetUniformLocation(program.id, "selected");
+	program.uflocs[selected_loc] =
+		glGetUniformLocation(program.id, "selected");
 	check_gl_error("glGetUniformLocation> selected");
-	program.uflocs[view_pos_loc] = glGetUniformLocation(program.id, "view_pos");
+	program.uflocs[view_pos_loc] =
+		glGetUniformLocation(program.id, "view_pos");
 	check_gl_error("glGetUniformLocation> view_pos");
-	program.uflocs[dlight_dir_loc] = glGetUniformLocation(program.id, "dlight_dir");
+	program.uflocs[dlight_dir_loc] =
+		glGetUniformLocation(program.id, "dlight_dir");
 	check_gl_error("glGetUniformLocation> dlight_dir");
 
 
@@ -117,9 +127,11 @@ Java_com_example_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
 	create_program(&camera_program, cam_atbs, cam_atbs_len);
 	check_gl_error("create_program");
 
-	camera_program.uflocs[mmatrix_loc] = glGetUniformLocation(camera_program.id, "MMatrix");
+	camera_program.uflocs[mmatrix_loc] =
+		glGetUniformLocation(camera_program.id, "MMatrix");
 	check_gl_error("glGetUniformLocation> MMatrix");
-	camera_program.uflocs[pmatrix_loc] = glGetUniformLocation(camera_program.id, "PMatrix");
+	camera_program.uflocs[pmatrix_loc] =
+		glGetUniformLocation(camera_program.id, "PMatrix");
 	check_gl_error("glGetUniformLocation> PMatrix");
 
 	text_renderer_init();
@@ -129,23 +141,33 @@ Java_com_example_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
 JNIEXPORT void JNICALL
 Java_com_example_p_engine_AGRenderer_clear(JNIEnv *env, jobject instance)
 {
+	UNUSED(env);
+	UNUSED(instance);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_Scene_set_1dir_1light_1dir(JNIEnv *env, jobject instance,
-						     jfloatArray dir_light_dir_) {
-	jfloat *dir_light_dir = (*env)->GetFloatArrayElements(env, dir_light_dir_, NULL);
+Java_com_example_p_engine_Scene_set_1dir_1light_1dir(JNIEnv *env,
+						     jobject instance,
+						     jfloatArray dld)
+{
+	UNUSED(instance);
+	jfloat *dir_light_dir = (*env)->GetFloatArrayElements(env, dld, NULL);
 
 	memcpy(dlight_dir, dir_light_dir, sizeof(dlight_dir));
 
-	(*env)->ReleaseFloatArrayElements(env, dir_light_dir_, dir_light_dir, 0);
+	(*env)->ReleaseFloatArrayElements(env, dld, dir_light_dir, 0);
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_AGRenderer_surface_1changed(JNIEnv *env, jobject instance,
+Java_com_example_p_engine_AGRenderer_surface_1changed(JNIEnv *env,
+						      jobject instance,
 						      jint width, jint height)
 {
+	UNUSED(env);
+	UNUSED(instance);
+
 	if (height == 0) {
 		height = 1;
 	}
@@ -163,9 +185,10 @@ Java_com_example_p_engine_AGRenderer_surface_1changed(JNIEnv *env, jobject insta
 		ratioH = (float) height / (float) width;
 	}
 
-	mat4x4_perspective(projection_matrix, M_PI_4, ratio, 1.0f, 1000.0f);
-	//mat4x4_frustum(projection_matrix, -ratioW, ratioW, -ratioH, ratioH, 1.0f, 100.0f);
-	mat4x4_ortho(ratio_ortho_matrix, -ratioW, ratioW, -ratioH, ratioH, -1.0f, 1.0f);
+	mat4x4_perspective(projection_matrix, (float) M_PI_4, ratio,
+			   1.0f, 1000.0f);
+	mat4x4_ortho(ratio_ortho_matrix, -ratioW, ratioW, -ratioH, ratioH,
+		     -1.0f, 1.0f);
 	mat4x4_ortho(size_ortho_matrix, 0, width, 0, height, -1.0f, 1.0f);
 
 	window_width = width;
@@ -176,6 +199,9 @@ JNIEXPORT void JNICALL
 Java_com_example_p_engine_AGRenderer_on_1destroy(JNIEnv *env,
 						 jobject instance)
 {
+	UNUSED(env);
+	UNUSED(instance);
+
 	AGR_INFO("cleaning up");
 	free_models();
 	free_imgs();
@@ -185,8 +211,12 @@ Java_com_example_p_engine_AGRenderer_on_1destroy(JNIEnv *env,
 }
 
 JNIEXPORT jint JNICALL
-Java_com_example_p_engine_AGRenderer_create_1oes_1texture(JNIEnv *env, jobject instance)
+Java_com_example_p_engine_AGRenderer_create_1oes_1texture(JNIEnv *env,
+							  jobject instance)
 {
+	UNUSED(env);
+	UNUSED(instance);
+
 	float coords[] = {
 		-1.0f, 1.0f, 0.0f,
 		-1.0f, -1.0f, 0.0f,
@@ -209,7 +239,6 @@ Java_com_example_p_engine_AGRenderer_create_1oes_1texture(JNIEnv *env, jobject i
 	create_vertices_buffer(&camera_mesh, coords, sizeof(coords),
 			       NULL, 0,
 			       textureCoords, sizeof(textureCoords),
-			       NULL, 0,
 			       indices, sizeof(indices));
 
 	camera_mesh.texts = calloc(1, sizeof(*camera_mesh.texts));
@@ -227,10 +256,12 @@ Java_com_example_p_engine_AGRenderer_create_1oes_1texture(JNIEnv *env, jobject i
 static void draw_imgs(JNIEnv *env, jobject scene)
 {
 	jsize ientities_len;
-	jobjectArray ientities = jscene_get_ientities(env, scene, &ientities_len);
+	jobjectArray ientities = jscene_get_ientities(env, scene,
+						      &ientities_len);
 	int i;
 	for (i = 0; i < ientities_len; i++) {
-		jobject ientity = (*env)->GetObjectArrayElement(env, ientities, i);
+		jobject ientity =
+			(*env)->GetObjectArrayElement(env, ientities, i);
 
 		int vis = jentity_is_visible(env, ientity);
 		if (!vis) {
@@ -262,7 +293,8 @@ static void draw_model(struct model_info *model)
 	for (i = 0; i < model->num_meshes; i++) {
 		struct mesh_info *mesh = &model->meshes[i];
 
-		glUniform1i(program.uflocs[has_texture_loc], mesh->has_texture);
+		glUniform1i(program.uflocs[has_texture_loc],
+			    mesh->has_texture);
 		check_gl_error("glUniform1i");
 		glUniform4fv(program.uflocs[dcolor_loc], 1, mesh->dcolor);
 		check_gl_error("glUniform4fv");
@@ -278,10 +310,12 @@ static void draw_model(struct model_info *model)
 static void draw_models(JNIEnv *env, jobject scene)
 {
 	jsize mentities_len;
-	jobjectArray mentities = jscene_get_mentities(env, scene, &mentities_len);
+	jobjectArray mentities =
+		jscene_get_mentities(env, scene, &mentities_len);
 	int i;
 	for (i = 0; i < mentities_len; i++) {
-		jobject entity = (*env)->GetObjectArrayElement(env, mentities, i);
+		jobject entity =
+			(*env)->GetObjectArrayElement(env, mentities, i);
 
 		int vis = jentity_is_visible(env, entity);
 		if (!vis) {
@@ -304,7 +338,8 @@ static void draw_models(JNIEnv *env, jobject scene)
 		float vpos[3];
 		jscene_get_camera_pos(env, scene, vpos);
 
-		glUniformMatrix4fv(program.uflocs[mmatrix_loc], 1, GL_FALSE, (const GLfloat *) mm);
+		glUniformMatrix4fv(program.uflocs[mmatrix_loc], 1, GL_FALSE,
+				   (const GLfloat *) mm);
 		check_gl_error("glUniformMatrix4fv");
 
 		glUniform3fv(program.uflocs[view_pos_loc], 1, vpos);
@@ -324,17 +359,21 @@ JNIEXPORT void JNICALL
 Java_com_example_p_engine_AGRenderer_draw(JNIEnv *env, jobject instance,
 					  jobject scene)
 {
+	UNUSED(instance);
+
 	enable_depth_test();
 	shader_program_bind(&program);
 
 
-	glUniformMatrix4fv(program.uflocs[pmatrix_loc], 1, GL_FALSE, (const GLfloat *) projection_matrix);
+	glUniformMatrix4fv(program.uflocs[pmatrix_loc], 1, GL_FALSE,
+			   (const GLfloat *) projection_matrix);
 	check_gl_error("glUniformMatrix4fv");
 
 
 	float vm[16];
 	jscene_get_view_matrix(env, scene, vm);
-	glUniformMatrix4fv(program.uflocs[vmatrix_loc], 1, GL_FALSE, (const GLfloat *) vm);
+	glUniformMatrix4fv(program.uflocs[vmatrix_loc], 1, GL_FALSE,
+			   (const GLfloat *) vm);
 	check_gl_error("glUniformMatrix4fv");
 
 
@@ -348,9 +387,14 @@ Java_com_example_p_engine_AGRenderer_draw(JNIEnv *env, jobject instance,
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_AGRenderer_draw_1camera(JNIEnv *env, jobject instance,
-						  jfloat rotation, jint width, jint height)
+Java_com_example_p_engine_AGRenderer_draw_1camera(JNIEnv *env,
+						  jobject instance,
+						  jfloat rotation,
+						  jint width, jint height)
 {
+	UNUSED(env);
+	UNUSED(instance);
+
 	float ratioW;
 	float ratioH;
 	float ratio = (float) width / (float) height;
@@ -366,53 +410,35 @@ Java_com_example_p_engine_AGRenderer_draw_1camera(JNIEnv *env, jobject instance,
 
 	static mat4x4 camera_mmatrix;
 	mat4x4_identity(camera_mmatrix);
-	mat4x4_scale_aniso(camera_mmatrix, camera_mmatrix, ratioW, ratioH, 1.0f);
+	mat4x4_scale_aniso(camera_mmatrix, camera_mmatrix, ratioW, ratioH,
+			   1.0f);
 	mat4x4_rotate_Z(camera_mmatrix, camera_mmatrix, rotation);
 
 	disable_depth_test();
 	check_gl_error("unknown");
 	shader_program_bind(&camera_program);
 
-	glUniformMatrix4fv(camera_program.uflocs[pmatrix_loc], 1, GL_FALSE, (const GLfloat *) ratio_ortho_matrix);
+	glUniformMatrix4fv(camera_program.uflocs[pmatrix_loc], 1, GL_FALSE,
+			   (const GLfloat *) ratio_ortho_matrix);
 	check_gl_error("glUniformMatrix4fv");
 
-	glUniformMatrix4fv(camera_program.uflocs[mmatrix_loc], 1, GL_FALSE, (const GLfloat *) camera_mmatrix);
+	glUniformMatrix4fv(camera_program.uflocs[mmatrix_loc], 1, GL_FALSE,
+			   (const GLfloat *) camera_mmatrix);
 	check_gl_error("glUniformMatrix4fv");
 
 	render_mesh(camera_program.id, &camera_mesh);
-
-	/*char *img = malloc(width * height * 4);
-	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, img);
-	long tr = 0;
-	long tg = 0;
-	long tb = 0;
-	long ta = 0;
-
-	int siz = width * height * 4;
-	int i;
-	for (i = 0; i < siz; i += 4) {
-		tr += img[i];
-		tg += img[i + 1];
-		tb += img[i + 2];
-		ta += img[i + 3];
-	}
-
-	long ar = tr / (siz / 4);
-	long ag = tg / (siz / 4);
-	long ab = tb / (siz / 4);
-	long aa = ta / (siz / 4);
-
-	AGR_INFO("average: (%d, %d, %d, %d)", ar, ag, ab, aa);
-	free(img);*/
 
 	shader_program_unbind();
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_AGRenderer_draw_1text(JNIEnv *env, jobject instance, jstring text_,
-						jfloat x, jfloat y, jfloat scale,
+Java_com_example_p_engine_AGRenderer_draw_1text(JNIEnv *env, jobject instance,
+						jstring text_,
+						jfloat x, jfloat y,
+						jfloat scale,
 						jfloatArray color_)
 {
+	UNUSED(instance);
 	const char *text = (*env)->GetStringUTFChars(env, text_, 0);
 	jfloat *color = (*env)->GetFloatArrayElements(env, color_, NULL);
 

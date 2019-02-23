@@ -58,16 +58,6 @@ int get_img_id(const char *path, size_t path_len)
 	return -1;
 }
 
-struct texture_info *get_img(int id)
-{
-	if (id >= imgs_len || id < 0) {
-		/* TODO: use error img */
-		return NULL;
-	}
-
-	return &imgs[id];
-}
-
 void free_imgs(void)
 {
 	int i;

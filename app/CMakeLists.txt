@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-add_compile_options(-Wall -Werror -Wextra -Wno-unused-parameter -Wno-gnu-zero-variadic-macro-arguments)# -pedantic)
+add_compile_options(-Wall -Werror -Wextra -Wno-unused-parameter)
 
 add_library(
         native-lib
@@ -47,19 +47,20 @@ target_link_libraries(
 )
 
 
-# stb_image
+# linmath
+include_directories(${CMAKE_SOURCE_DIR}/src/main/jni/external/linmath)
 
+
+# stb_image
 include_directories(${CMAKE_SOURCE_DIR}/src/main/jni/external/stb_image/include)
 
 
 # FreeType 2
-
 include_directories(${CMAKE_SOURCE_DIR}/src/main/jni/external/ft2/include)
 target_link_libraries(native-lib ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${CMAKE_ANDROID_ARCH_ABI}/libfreetype.a)
 
 
 # Assimp
-
 include_directories(${CMAKE_SOURCE_DIR}/src/main/jni/external/assimp/include)
 
 target_link_libraries(

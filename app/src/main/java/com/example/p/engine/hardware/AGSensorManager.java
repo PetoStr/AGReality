@@ -5,14 +5,10 @@ import java.util.List;
 
 public class AGSensorManager {
 
-	List<AGSensor> sensors = new ArrayList<>();
+	private List<AGSensor> sensors = new ArrayList<>();
 
 	public void addAGSensor(AGSensor sensor) {
 		sensors.add(sensor);
-	}
-
-	public void removeAGSensor(AGSensor sensor) {
-		sensors.remove(sensor);
 	}
 
 	public void startSensors() {

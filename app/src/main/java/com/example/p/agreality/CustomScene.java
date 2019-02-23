@@ -15,10 +15,6 @@ public class CustomScene extends Scene {
 		return selectedImageEntities;
 	}
 
-	public void setSelectedImageEntities(SparseArray<ImageEntity> selectedImageEntities) {
-		this.selectedImageEntities = selectedImageEntities;
-	}
-
 	public ModeledEntity getSelectedModeledEntity() {
 		return selectedModeledEntity;
 	}

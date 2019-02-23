@@ -39,7 +39,8 @@ struct texture_info create_texture(const char *fname, const char *tname)
 
 	unsigned char *img;
 	img = stbi_load_from_memory((const unsigned char *) content,
-				    len, &t.width, &t.height, &comp, STBI_rgb_alpha);
+				    (int) len, &t.width, &t.height,
+				    &comp, STBI_rgb_alpha);
 	if (img == NULL) {
 		AGR_ERROR("failed to load %s\n", fname);
 		return t;
@@ -63,27 +64,6 @@ struct texture_info create_texture(const char *fname, const char *tname)
 		     0, GL_RGBA, GL_UNSIGNED_BYTE, img);
 
 	glGenerateMipmap(GL_TEXTURE_2D);
-
-	/*long tr = 0;
-	long tg = 0;
-	long tb = 0;
-	long ta = 0;
-
-	int siz = t.width * t.height * 4;
-	int i;
-	for (i = 0; i < siz; i += 4) {
-		tr += img[i];
-		tg += img[i + 1];
-		tb += img[i + 2];
-		ta += img[i + 3];
-	}
-
-	long ar = tr / (siz / 4);
-	long ag = tg / (siz / 4);
-	long ab = tb / (siz / 4);
-	long aa = ta / (siz / 4);
-
-	AGR_INFO("average: (%d, %d, %d, %d)", ar, ag, ab, aa);*/
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -111,8 +91,10 @@ struct texture_info create_oes_texture(void)
 
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, t.id);
 
-	glTexParameterf(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_EXTERNAL_OES,
+			GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_EXTERNAL_OES,
+			GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
 
@@ -125,7 +107,6 @@ void free_texture(struct texture_info *t)
 		return;
 
 	AGR_INFO("freeing texture %s (%s)\n", t->path, t->type);
-	//glDeleteTextures(1, &t->id);
 	free(t->type);
 	free(t->path);
 }
@@ -224,27 +205,30 @@ enum LOAD_STATUS load_model(const char *model_name, struct model_info *model)
 	dir[lsl + 1] = '\0';
 
 #ifndef NDEBUG
-	struct aiLogStream stream = aiGetPredefinedLogStream(aiDefaultLogStream_STDOUT, NULL);
+	struct aiLogStream stream;
+	stream = aiGetPredefinedLogStream(aiDefaultLogStream_STDOUT, NULL);
 	aiAttachLogStream(&stream);
 #endif
 
 	const struct aiScene *scene;
 	scene = aiImportFileEx(model_name,
-			     aiProcess_Triangulate |
-			     aiProcess_JoinIdenticalVertices |
-			     aiProcess_FixInfacingNormals |
-			     aiProcess_GenUVCoords |
-			     aiProcess_GenNormals |
-			     aiProcess_FlipUVs |
-			     aiProcess_OptimizeMeshes |
-			     aiProcess_RemoveRedundantMaterials, &custom_fileio);
+			       aiProcess_Triangulate |
+			       aiProcess_JoinIdenticalVertices |
+			       aiProcess_FixInfacingNormals |
+			       aiProcess_GenUVCoords |
+			       aiProcess_GenNormals |
+			       aiProcess_FlipUVs |
+			       aiProcess_OptimizeMeshes |
+			       aiProcess_RemoveRedundantMaterials,
+			       &custom_fileio);
 	if (!scene) {
 		AGR_ERROR("failed to load model %s\n", model_name);
 		return LOAD_FAILED;
 	}
 
 	model->num_meshes = scene->mNumMeshes;
-	model->meshes = calloc(model->num_meshes, sizeof(struct mesh_info));
+	model->meshes = calloc((size_t) model->num_meshes,
+			       sizeof(struct mesh_info));
 
 	struct aiVector3D *min = &model->min;
 	struct aiVector3D *max = &model->max;
@@ -269,9 +253,6 @@ enum LOAD_STATUS load_model(const char *model_name, struct model_info *model)
 
 		size_t tc_size = sizeof(float) * mesh->mNumVertices * 2;
 		float *tc = malloc(tc_size);
-
-		size_t tangents_size = sizeof(float) * num_vertices;
-		float *tangents = malloc(tangents_size);
 
 		size_t ind_size = sizeof(unsigned int) * num_indices;
 		unsigned int *ind = malloc(ind_size);
@@ -312,40 +293,35 @@ enum LOAD_STATUS load_model(const char *model_name, struct model_info *model)
 				       pos, pos_size,
 				       norms, norm_size,
 				       tc, tc_size,
-				       tangents, tangents_size,
 				       ind, ind_size);
 
 		struct aiMaterial *material;
 		material = scene->mMaterials[mesh->mMaterialIndex];
 
 		load_material_textures(material, model, &model->meshes[i],
-				       aiTextureType_DIFFUSE, "texture_diffuse",
-				       dir);
+				       aiTextureType_DIFFUSE,
+				       "texture_diffuse", dir);
 		load_material_textures(material, model, &model->meshes[i],
-				       aiTextureType_SPECULAR, "texture_specular",
-				       dir);
-
-		int r;
-		for (r = aiTextureType_NONE; r < aiTextureType_UNKNOWN; r++) {
-			unsigned int textures = aiGetMaterialTextureCount(material, r);
-			if (textures != 0) {
-				AGR_INFO("%d texture%sof type %d",
-					 textures, textures != 1 ? "s " : " ", r);
-			}
-		}
+				       aiTextureType_SPECULAR,
+				       "texture_specular", dir);
 
 		if (!(model->meshes[i].has_texture & DIFFUSE_TMAP_MASK)) {
 			struct aiColor4D diff;
-			int res = aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diff);
+			int res = aiGetMaterialColor(material,
+						     AI_MATKEY_COLOR_DIFFUSE,
+						     &diff);
 			if (res == AI_SUCCESS) {
 				model->meshes[i].dcolor[0] = diff.r;
 				model->meshes[i].dcolor[1] = diff.g;
 				model->meshes[i].dcolor[2] = diff.b;
 				model->meshes[i].dcolor[3] = diff.a;
 			}
-		} else if (!(model->meshes[i].has_texture & SPECULAR_TMAP_MASK)) {
+		} else if (!(model->meshes[i].has_texture
+			     & SPECULAR_TMAP_MASK)) {
 			struct aiColor4D spec;
-			int res = aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &spec);
+			int res = aiGetMaterialColor(material,
+						     AI_MATKEY_COLOR_DIFFUSE,
+						     &spec);
 			if (res == AI_SUCCESS) {
 				model->meshes[i].scolor[0] = spec.r;
 				model->meshes[i].scolor[1] = spec.g;
@@ -356,7 +332,10 @@ enum LOAD_STATUS load_model(const char *model_name, struct model_info *model)
 
 		float op = 1.0f;
 		struct aiColor4D opac;
-		if (aiGetMaterialColor(material, AI_MATKEY_OPACITY, &opac) == AI_SUCCESS) {
+		aiReturn opc = aiGetMaterialColor(material,
+						  AI_MATKEY_OPACITY,
+						  &opac);
+		if (opc == AI_SUCCESS) {
 			op = opac.r;
 		}
 
@@ -382,7 +361,8 @@ enum LOAD_STATUS load_model(const char *model_name, struct model_info *model)
 	return LOAD_SUCCESSFUL;
 }
 
-static int handle_model(const char *path, size_t path_len, struct model_info *model)
+static int handle_model(const char *path, size_t path_len,
+			struct model_info *model)
 {
 	int id = get_model_id(path, path_len);
 	if (id == -1) {
@@ -413,8 +393,8 @@ static int handle_model(const char *path, size_t path_len, struct model_info *mo
 	return id;
 }
 
-static int handle_texture(const char *path, size_t path_len, JNIEnv *env, jobject ientity,
-			  struct texture_info *tex)
+static int handle_texture(const char *path, size_t path_len, JNIEnv *env,
+			  jobject ientity, struct texture_info *tex)
 {
 	int id = get_img_id(path, path_len);
 	if (id == -1) {
@@ -450,7 +430,8 @@ Java_com_example_p_engine_entities_Entity_load(JNIEnv *env, jobject instance)
 	jobject resource = jget_resource(env, instance);
 	jclass rclass = (*env)->GetObjectClass(env, resource);
 
-	jmethodID get_path = (*env)->GetMethodID(env, rclass, "getPath", "()Ljava/lang/String;");
+	jmethodID get_path = (*env)->GetMethodID(env, rclass, "getPath",
+						 "()Ljava/lang/String;");
 
 	jstring jpath = (*env)->CallObjectMethod(env, resource, get_path);
 	const char *path = (*env)->GetStringUTFChars(env, jpath, NULL);
@@ -476,7 +457,8 @@ Java_com_example_p_engine_entities_Entity_load(JNIEnv *env, jobject instance)
 
 			break;
 		case RESOURCE_TYPE_TEXTURE:
-			id = handle_texture(path, path_len, env, instance, &tex);
+			id = handle_texture(path, path_len, env,
+					    instance, &tex);
 
 			min[0] = 0.0f;
 			min[0] = 0.0f;

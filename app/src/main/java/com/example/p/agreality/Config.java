@@ -5,6 +5,8 @@ public final class Config {
 	public static final float MOVE_SPEED = 9.0f;
 	public static final float ROTATION_SPEED = (float) (Math.PI / 2.0f);
 
+	public static final float DISPLACEMENT_FROM_CAMERA = 30.0f;
+
 	public static final long RELEASE_WAIT_TIME_NS = 1000000000;
 
 	public static final float FLOATING_SPEED = 2.0f;
@@ -18,7 +20,7 @@ public final class Config {
 
 	public static final float ROOM_SCALE = 5.0f;
 
-	public static final String MODELS_PATH = "models/";
+	private static final String MODELS_PATH = "models/";
 	public static final String MODEL_WRAITH = MODELS_PATH + "wraith/Wraith_Raider_Starship.obj";
 	public static final String MODEL_OFFICE_CHAIR = MODELS_PATH + "office_chair/office_chair.obj";
 	public static final String MODEL_EARTH = MODELS_PATH + "earth/earth.obj"; // https://free3d.com/3d-model/earth-v1--590680.html
@@ -26,7 +28,7 @@ public final class Config {
 	public static final String MODEL_ROOM = MODELS_PATH + "room/room.obj"; // https://free3d.com/3d-model/room-48457.html
 
 
-	public static final String IMAGES_PATH = "imgs/";
+	private static final String IMAGES_PATH = "imgs/";
 
 	public static final String IMAGE_GRASS = IMAGES_PATH  + "grass.png";
 

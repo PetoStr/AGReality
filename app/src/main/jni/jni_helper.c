@@ -15,7 +15,8 @@
 jobject jget_resource(JNIEnv *env, jobject entity)
 {
 	jclass eclass = (*env)->GetObjectClass(env, entity);
-	jmethodID gres = (*env)->GetMethodID(env, eclass, "getResource", "()L" RESOURCE_CLASS ";");
+	jmethodID gres =(*env)->GetMethodID(env, eclass, "getResource",
+					    "()L" RESOURCE_CLASS ";");
 
 	return (*env)->CallObjectMethod(env, entity, gres);
 }
@@ -23,7 +24,8 @@ jobject jget_resource(JNIEnv *env, jobject entity)
 int jget_resource_type(JNIEnv *env, jobject resource)
 {
 	jclass rclass = (*env)->GetObjectClass(env, resource);
-	jmethodID get_type = (*env)->GetMethodID(env, rclass, "getType", "()I");
+	jmethodID get_type =
+		(*env)->GetMethodID(env, rclass, "getType", "()I");
 
 	return (*env)->CallIntMethod(env, resource, get_type);;
 }
@@ -48,7 +50,8 @@ jobject jscene_get_camera(JNIEnv *env, jobject scene)
 	jclass sclass = (*env)->GetObjectClass(env, scene);
 
 	jmethodID get_camera = (*env)->GetMethodID(env, sclass,
-						   "getCamera", "()L" CAMERA_CLASS ";");
+						   "getCamera",
+						   "()L" CAMERA_CLASS ";");
 
 	return (*env)->CallObjectMethod(env, scene, get_camera);
 }
@@ -93,11 +96,13 @@ jobjectArray jscene_get_mentities(JNIEnv *env, jobject scene, jsize *len)
 {
 	jclass sclass = (*env)->GetObjectClass(env, scene);
 
-	jmethodID get_entities = (*env)->GetMethodID(env, sclass,
-						     "getModeledEntitiesArray",
-						     "()[L" MENTITY_CLASS ";");
+	jmethodID get_entities =
+		(*env)->GetMethodID(env, sclass,
+				    "getModeledEntitiesArray",
+				    "()[L" MENTITY_CLASS ";");
 
-	jobjectArray jmentities = (*env)->CallObjectMethod(env, scene, get_entities);
+	jobjectArray jmentities =
+		(*env)->CallObjectMethod(env, scene, get_entities);
 
 	if (len) {
 		*len = (*env)->GetArrayLength(env, jmentities);
@@ -110,11 +115,13 @@ jobjectArray jscene_get_ientities(JNIEnv *env, jobject scene, jsize *len)
 {
 	jclass sclass = (*env)->GetObjectClass(env, scene);
 
-	jmethodID get_entities = (*env)->GetMethodID(env, sclass,
-						     "getImageEntitiesArray",
-						     "()[L" IENTITY_CLASS ";");
+	jmethodID get_entities =
+		(*env)->GetMethodID(env, sclass,
+				    "getImageEntitiesArray",
+				    "()[L" IENTITY_CLASS ";");
 
-	jobjectArray jientities = (*env)->CallObjectMethod(env, scene, get_entities);
+	jobjectArray jientities =
+		(*env)->CallObjectMethod(env, scene, get_entities);
 
 	if (len) {
 		*len = (*env)->GetArrayLength(env, jientities);
@@ -172,10 +179,12 @@ void jentity_set_max(JNIEnv *env, jobject entity, float x, float y, float z)
 	(*env)->CallVoidMethod(env, entity, sm, x, y, z);
 }
 
-void jentity_set_center(JNIEnv *env, jobject entity, float x, float y, float z)
+void jentity_set_center(JNIEnv *env, jobject entity,
+			float x, float y, float z)
 {
 	jclass eclass = (*env)->GetObjectClass(env, entity);
-	jmethodID sc = (*env)->GetMethodID(env, eclass, "setCenter", "(FFF)V");
+	jmethodID sc =
+		(*env)->GetMethodID(env, eclass, "setCenter", "(FFF)V");
 
 	(*env)->CallVoidMethod(env, entity, sc, x, y, z);
 }
@@ -183,17 +192,21 @@ void jentity_set_center(JNIEnv *env, jobject entity, float x, float y, float z)
 float jientity_get_opacity(JNIEnv *env, jobject ientity)
 {
 	jclass ieclass = (*env)->GetObjectClass(env, ientity);
-	jmethodID gopct = (*env)->GetMethodID(env, ieclass, "getOpacity", "()F");
+	jmethodID gopct =
+		(*env)->GetMethodID(env, ieclass, "getOpacity", "()F");
 
 	return (*env)->CallFloatMethod(env, ientity, gopct);
 }
 
-void jientity_set_size(JNIEnv *env, jobject ientity, float width, float height)
+void jientity_set_size(JNIEnv *env, jobject ientity,
+		       float width, float height)
 {
 	jclass ieclass = (*env)->GetObjectClass(env, ientity);
 
-	jmethodID swidth = (*env)->GetMethodID(env, ieclass, "setWidth", "(F)V");
-	jmethodID sheight = (*env)->GetMethodID(env, ieclass, "setHeight", "(F)V");
+	jmethodID swidth =
+		(*env)->GetMethodID(env, ieclass, "setWidth", "(F)V");
+	jmethodID sheight =
+		(*env)->GetMethodID(env, ieclass, "setHeight", "(F)V");
 
 	(*env)->CallVoidMethod(env, ientity, swidth, width);
 	(*env)->CallVoidMethod(env, ientity, sheight, height);
@@ -202,9 +215,11 @@ void jientity_set_size(JNIEnv *env, jobject ientity, float width, float height)
 JNIEXPORT jfloatArray JNICALL
 Java_com_example_p_engine_Screen_get_1pmatrix(JNIEnv *env, jclass type)
 {
+	UNUSED(type);
 	jfloatArray pm = (*env)->NewFloatArray(env, 16);
 
-	(*env)->SetFloatArrayRegion(env, pm, 0, 16, (const jfloat *) projection_matrix);
+	(*env)->SetFloatArrayRegion(env, pm, 0, 16,
+				    (const jfloat *) projection_matrix);
 
 	return pm;
 }

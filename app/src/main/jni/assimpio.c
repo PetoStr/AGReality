@@ -3,6 +3,7 @@
 
 #include "agrlog.h"
 #include "assimpio.h"
+#include "util.h"
 
 struct file_info {
 	off_t pos;
@@ -18,18 +19,22 @@ struct open_files {
 
 aiFileReadProc custom_read(C_STRUCT aiFile *file, char *ptr,
 			   size_t size_of_elements,
-			   size_t number_of_elements)
+			   size_t num_of_elements)
 {
 	assert(ptr != NULL);
 	struct file_info *fi = (struct file_info *) file->UserData;
-	size_t count = size_of_elements * number_of_elements;
+	size_t count = size_of_elements * num_of_elements;
 	fi->pos += count;
 	return (aiFileReadProc) (size_t) AAsset_read(fi->aasset, ptr, count);
 }
 
 aiFileWriteProc custom_write(C_STRUCT aiFile *file, const char *ptr,
-			     size_t size_of_elements, size_t number_of_elements)
+			     size_t size_of_elements, size_t num_of_elements)
 {
+	UNUSED(file);
+	UNUSED(ptr);
+	UNUSED(size_of_elements);
+	UNUSED(num_of_elements);
 	AGR_ERROR("called unsupported function custom_write()");
 	return 0;
 }
@@ -73,6 +78,7 @@ aiFileSeek custom_seek(C_STRUCT aiFile *file,
 
 aiFileFlushProc custom_flush(C_STRUCT aiFile *file)
 {
+	UNUSED(file);
 	AGR_ERROR("called unsupported function custom_flush()");
 	return NULL;
 }
@@ -80,6 +86,7 @@ aiFileFlushProc custom_flush(C_STRUCT aiFile *file)
 aiFileOpenProc custom_open(C_STRUCT aiFileIO *fileIO,
 			   const char* filename, const char* mode)
 {
+	UNUSED(fileIO);
 	assert(filename != NULL);
 	assert(mode != NULL);
 
@@ -117,6 +124,7 @@ aiFileOpenProc custom_open(C_STRUCT aiFileIO *fileIO,
 
 aiFileCloseProc custom_close(C_STRUCT aiFileIO* fileIO, C_STRUCT aiFile* file)
 {
+	UNUSED(fileIO);
 	struct file_info *fi = (struct file_info *) file->UserData;
 
 	AAsset_seek(fi->aasset, 0, aiOrigin_SET);

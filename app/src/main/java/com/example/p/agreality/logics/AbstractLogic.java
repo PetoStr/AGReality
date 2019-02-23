@@ -1,10 +1,10 @@
 package com.example.p.agreality.logics;
 
-public abstract class AbstractLogic implements SimpleLogic {
+abstract class AbstractLogic implements SimpleLogic {
 
-	protected LogicState logicState;
+	LogicState logicState;
 
-	public AbstractLogic(LogicState logicState) {
+	AbstractLogic(LogicState logicState) {
 		this.logicState = logicState;
 	}
 

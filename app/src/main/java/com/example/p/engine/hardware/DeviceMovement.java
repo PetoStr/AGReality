@@ -9,11 +9,14 @@ import android.hardware.SensorManager;
 import android.util.Log;
 
 import com.example.p.engine.App;
-import com.example.p.engine.MainActivity;
 
 public enum DeviceMovement implements SensorEventListener, AGSensor {
 
 	INSTANCE;
+
+	private static final String TAG = "DeviceMovement";
+
+	private static final boolean DISABLE_DISTANCE_MEASUREMENT = true;
 
 	private static final float ALPHA = 0.05f;
 
@@ -25,21 +28,25 @@ public enum DeviceMovement implements SensorEventListener, AGSensor {
 	private Sensor magnetometer;
 	private Sensor gyroscope;
 	private Sensor linAccel;
+	private Sensor gravity;
 
 	private boolean hasGyro;
 
 	private float[] accelerometerData = new float[3];
 	private float[] magnetometerData = new float[3];
+	private float[] gravityData = new float[3];
 	private float[] rotationData = new float[5];
 	private boolean hasAccelerometerData;
-	private boolean hasMagnetoMeterData;
+	private boolean hasMagnetometerData;
 	private boolean hasRotationData;
 
-	private float[] accelStorage = new float[3];
-
 	private final float[] orientationAngles = new float[3];
+	float[] position = new float[3];
 
-	float[] earthAcceleration = new float[16];
+	private long timestamp;
+	private double[] initVel = new double[3];
+	private double[] totalAccel = new double[3];
+	private double[] vel = new double[3];
 
 	DeviceMovement() {
 		sensorManager = (SensorManager) App.getContext().getSystemService(Context.SENSOR_SERVICE);
@@ -47,20 +54,31 @@ public enum DeviceMovement implements SensorEventListener, AGSensor {
 		magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 		gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 		linAccel = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+		gravity = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
 
-		hasGyro = App.getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_GYROSCOPE);
+		PackageManager packageManager = App.getContext().getPackageManager();
+		hasGyro = packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_GYROSCOPE);
 		Log.i("gyro", "hasGyro = " + hasGyro);
 	}
 
 	@Override
 	public void start() {
 		if (!isListening) {
-			sensorManager.registerListener(this, linAccel, SensorManager.SENSOR_DELAY_GAME);
+			if (!DISABLE_DISTANCE_MEASUREMENT) {
+				sensorManager.registerListener(this, gravity, SensorManager.SENSOR_DELAY_GAME);
+			}
+
 			if (hasGyro) {
+				if (!DISABLE_DISTANCE_MEASUREMENT) {
+					sensorManager.registerListener(this, linAccel,
+												   SensorManager.SENSOR_DELAY_GAME);
+				}
 				sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_GAME);
 			} else {
-				sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
-				sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
+				sensorManager.registerListener(this, accelerometer,
+											   SensorManager.SENSOR_DELAY_GAME);
+				sensorManager.registerListener(this, magnetometer,
+											   SensorManager.SENSOR_DELAY_GAME);
 			}
 			isListening = true;
 		}
@@ -74,13 +92,28 @@ public enum DeviceMovement implements SensorEventListener, AGSensor {
 		}
 	}
 
-	private float[] lowPass(float[] input, float[] output, float alpha) {
+	private float[] lowPass(float[] input, float[] output) {
 		if (output == null) return input;
 
 		for (int i = 0; i < input.length; i++) {
-			output[i] = output[i] + alpha * (input[i] - output[i]);
+			output[i] = output[i] + ALPHA * (input[i] - output[i]);
 		}
+
 		return output;
+	}
+
+	// https://stackoverflow.com/a/12942776
+	void dblIntegrate(float[] data, float dt) {
+		for (int i = 0; i < 3; i++) {
+			if (!hasGyro) {
+				data[i] -= gravityData[i];
+			}
+
+			totalAccel[i] += data[i] * dt;
+			vel[i] = (initVel[i] + (totalAccel[i])) * dt;
+			position[i] += vel[i];
+			initVel[i] = vel[i];
+		}
 	}
 
 	@Override
@@ -93,19 +126,33 @@ public enum DeviceMovement implements SensorEventListener, AGSensor {
 				hasRotationData = true;
 				break;
 			case Sensor.TYPE_ACCELEROMETER:
-				accelerometerData = lowPass(sensorEvent.values.clone(), accelerometerData, ALPHA);
+				if (!DISABLE_DISTANCE_MEASUREMENT) {
+					if (timestamp != 0) {
+						float dt = (sensorEvent.timestamp - timestamp) / 1000000000.0f;
+						dblIntegrate(sensorEvent.values.clone(), dt);
+					}
+					timestamp = sensorEvent.timestamp;
+				}
+				accelerometerData = lowPass(sensorEvent.values.clone(), accelerometerData);
 				hasAccelerometerData = true;
 				break;
 			case Sensor.TYPE_MAGNETIC_FIELD:
-				magnetometerData = lowPass(sensorEvent.values.clone(), magnetometerData, ALPHA);
-				hasMagnetoMeterData = true;
+				magnetometerData = lowPass(sensorEvent.values.clone(), magnetometerData);
+				hasMagnetometerData = true;
 				break;
 			case Sensor.TYPE_LINEAR_ACCELERATION:
-				earthAcceleration = lowPass(sensorEvent.values.clone(), earthAcceleration, ALPHA);
+				if (timestamp != 0) {
+					float dt = (sensorEvent.timestamp - timestamp) / 1000000000.0f;
+					dblIntegrate(sensorEvent.values.clone(), dt);
+				}
+				timestamp = sensorEvent.timestamp;
+				break;
+			case Sensor.TYPE_GRAVITY:
+				gravityData = sensorEvent.values.clone();
 				break;
 		}
 
-		updateOrientationAndAccel();
+		updateOrientation();
 	}
 
 	@Override
@@ -117,24 +164,24 @@ public enum DeviceMovement implements SensorEventListener, AGSensor {
 		return orientationAngles;
 	}
 
-	public float[] getEarthAcceleration() {
-		return earthAcceleration;
+	public float[] getPosition() {
+		return position;
 	}
 
-	private void updateOrientationAndAccel() {
+	private void updateOrientation() {
 		float[] rotationMatrix = new float[9];
 
-		if (hasRotationData) {
+		if (hasGyro && hasRotationData) {
 			SensorManager.getRotationMatrixFromVector(rotationMatrix, rotationData);
 			hasRotationData = false;
-		} else if (hasMagnetoMeterData && hasAccelerometerData) {
+		} else if (!hasGyro && hasMagnetometerData && hasAccelerometerData) {
 			boolean res = SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerData,
 					magnetometerData);
 			if (!res) {
-				System.err.println("failed");
+				Log.e(TAG, "failed to get rotation");
 				return;
 			}
-			hasMagnetoMeterData = false;
+			hasMagnetometerData = false;
 			hasAccelerometerData = false;
 		} else {
 			return;
@@ -144,68 +191,5 @@ public enum DeviceMovement implements SensorEventListener, AGSensor {
 		SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_X,
 				SensorManager.AXIS_Z, outR);
 		SensorManager.getOrientation(outR, orientationAngles);
-
-		//orientationAngles[1] += Math.PI / 2.0f;
-
-		/*if(gravityData[2] < 0) {
-			if (orientationAngles[1] > 0) {
-				orientationAngles[1] = (float) (Math.PI - orientationAngles[1]);
-			}
-			else {
-				orientationAngles[1] = (float) (-Math.PI - orientationAngles[1]);
-			}
-		}*/
-
-		//orientationAngles[0] = (float) Math.toRadians(orientationData[0]);
-		//orientationAngles[1] = (float) Math.toRadians(orientationData[1]);
-		//orientationAngles[2] = (float) Math.toRadians(orientationData[2]);
-
-		/*for (int i = 0; i < orientationAngles.length; i++) {
-			//orientationAngles[i] /= Math.PI;
-			orientationAngles[i] *= 100;
-			orientationAngles[i] = (int)orientationAngles[i];
-			orientationAngles[i] /= 100;
-		}*/
-
-		/*Log.d("yaw", ":" + Math.toDegrees(orientationAngles[0]));
-		Log.d("pitch", ":" + Math.toDegrees(orientationAngles[1]));
-		Log.d("roll", ":" + Math.toDegrees(orientationAngles[2]));*/
-
-		/*try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}*/
-
-		//System.out.print("--------");
-
-        /*int displayRotation = Main.INSTANCE.getResources().getConfiguration().orientation;
-        float[] orientation = adjustAccelOrientation(displayRotation, accelerometerData);
-
-        System.out.print("[\t");
-        System.out.print(orientation[0]);
-        System.out.print(",\t");
-        System.out.print(orientation[1]);
-        System.out.print(",\t");
-        System.out.print(orientation[2]);
-        System.out.println("]");*/
-
-		/*SensorManager.getRotationMatrix(rotationMatrix, null,
-				gravityData, magnetometerData);
-
-		SensorManager.getOrientation(rotationMatrix, orientationAngles);
-
-		float[] inv = new float[16];
-
-		Matrix.invertM(inv, 0, rotationMatrix, 0);
-		Matrix.multiplyMV(earthAcceleration, 0, inv, 0, accelerometerData, 0);
-
-		System.out.print("[\t");
-		System.out.print(orientationAngles[0]);
-		System.out.print(",\t");
-		System.out.print(orientationAngles[1]);
-		System.out.print(",\t");
-		System.out.print(orientationAngles[2]);
-		System.out.println("]");*/
 	}
 }

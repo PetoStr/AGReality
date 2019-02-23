@@ -8,7 +8,7 @@ import org.joml.Vector3f;
 
 public class MovementButton extends ImageEntity {
 
-	Vector3f move;
+	private Vector3f move;
 
 	public MovementButton(CustomScene scene, String path, Vector3f move) {
 		super(scene, path);

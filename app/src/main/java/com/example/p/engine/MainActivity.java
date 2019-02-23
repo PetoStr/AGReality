@@ -2,7 +2,6 @@ package com.example.p.engine;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -10,7 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 
 import com.example.p.engine.hardware.AGSensorManager;
-public class MainActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
+
+public class MainActivity extends Activity
+		implements ActivityCompat.OnRequestPermissionsResultCallback {
 
 	private AGSurfaceView glSurfaceView;
 
@@ -26,17 +27,6 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
 	}
 
 	@Override
-	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-		for (int result : grantResults) {
-			if (result == PackageManager.PERMISSION_DENIED) {
-				System.exit(3);
-			}
-		}
-
-		initSurfaceView();
-	}
-
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -44,8 +34,10 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
 
 		MainActivity.sensorManager = new AGSensorManager();
 
-		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-			ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA }, 1);
+		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+				!= PackageManager.PERMISSION_GRANTED) {
+			String[] permissions = new String[] { Manifest.permission.CAMERA };
+			ActivityCompat.requestPermissions(this, permissions, 1);
 		} else {
 			initSurfaceView();
 		}
@@ -68,13 +60,25 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
 		if (glSurfaceView != null) {
 			glSurfaceView.onPause();
 		}
-		/* TODO DeviceMovement should not be stopped */
 		sensorManager.pauseSensors();
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode,
+										   @NonNull String[] permissions,
+										   @NonNull int[] grantResults) {
+		for (int result : grantResults) {
+			if (result == PackageManager.PERMISSION_DENIED) {
+				System.exit(3);
+			}
+		}
+
+		initSurfaceView();
 	}
 
 	public static AGSensorManager getSensorManager() {

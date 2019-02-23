@@ -19,10 +19,7 @@
 
 #endif
 
-
-#define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof(arr[0]))
-
-#define ABS(x) ((x) < 0 ? -(x) : (x))
+#define UNUSED(x) ((void) x)
 
 static inline void fix_path_slashes(char *path) {
 	char *c = path;

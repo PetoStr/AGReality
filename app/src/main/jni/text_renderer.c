@@ -3,8 +3,6 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "linmath.h"
-
 #include "agrlog.h"
 #include "files.h"
 #include "pv_matrices.h"
@@ -44,7 +42,8 @@ static void init_ft(char *font, FT_Library *flib, FT_Face *fface)
 
 	off_t len = read_file(&fbuf, font);
 	AGR_INFO("len = %ld", len);
-	if (FT_New_Memory_Face(*flib, (const FT_Byte *) fbuf, len, 0, fface)) {
+	if (FT_New_Memory_Face(*flib, (const FT_Byte *) fbuf, len, 0,
+			       fface)) {
 		AGR_ERROR("failed to load font %s", font);
 		return;
 	}
@@ -80,16 +79,25 @@ static void init_chars(void)
 		glBindTexture(GL_TEXTURE_2D, chars[c].tid);
 		check_gl_error("glBindTexture");
 
-		/* XXX GL_RED does not work on every device (GL_INVALID_OPERATION) */
+		/*
+		 * XXX GL_RED does not work on every device
+		 * (GL_INVALID_OPERATION)
+		 */
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE,
-			     fface->glyph->bitmap.width, fface->glyph->bitmap.rows,
-			     0, GL_LUMINANCE, GL_UNSIGNED_BYTE, fface->glyph->bitmap.buffer);
+			     fface->glyph->bitmap.width,
+			     fface->glyph->bitmap.rows,
+			     0, GL_LUMINANCE, GL_UNSIGNED_BYTE,
+			     fface->glyph->bitmap.buffer);
 		check_gl_error("glTexImage2D");
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D,
+				GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D,
+				GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D,
+				GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D,
+				GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		check_gl_error("glTexParameteri");
 
 		chars[c].adv = fface->glyph->advance.x;
@@ -109,9 +117,11 @@ static void init_vobjects(void)
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, NULL,
+		     GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+			      4 * sizeof(GLfloat), 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -131,7 +141,8 @@ void text_renderer_init(void)
 	create_program(&sprog, atbs, 1);
 
 	sprog.uflocs[text_loc] = glGetUniformLocation(sprog.id, "text");
-	sprog.uflocs[text_color_loc] = glGetUniformLocation(sprog.id, "text_color");
+	sprog.uflocs[text_color_loc] =
+		glGetUniformLocation(sprog.id, "text_color");
 	sprog.uflocs[pmatrix_loc] = glGetUniformLocation(sprog.id, "PMatrix");
 
 	init_vobjects();
@@ -147,7 +158,8 @@ void render_text(const char *str, GLfloat x, GLfloat y,
 	check_gl_error("glUniform3f");
 	glUniform1i(sprog.uflocs[text_loc], 0);
 	check_gl_error("glUniform1i");
-	glUniformMatrix4fv(sprog.uflocs[pmatrix_loc], 1, GL_FALSE, (const GLfloat *) size_ortho_matrix);
+	glUniformMatrix4fv(sprog.uflocs[pmatrix_loc], 1, GL_FALSE,
+			   (const GLfloat *) size_ortho_matrix);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(vao);
@@ -179,7 +191,8 @@ void render_text(const char *str, GLfloat x, GLfloat y,
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glEnableVertexAttribArray(0);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+		glBufferSubData(GL_ARRAY_BUFFER, 0,
+				sizeof(vertices), vertices);
 		check_gl_error("glBufferSubData");
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 

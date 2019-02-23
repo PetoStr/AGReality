@@ -15,7 +15,7 @@ static const int pmatrix_loc = 0;
 static const int mmatrix_loc = 1;
 static const int img_loc = 2;
 static const int opac_loc = 3;
-static const int selected_loc = 4;
+static const int sel_loc = 4;
 
 static void init_vobject(void)
 {
@@ -36,7 +36,8 @@ static void init_vobject(void)
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
+			      2 * sizeof(GLfloat), 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -56,7 +57,7 @@ void img_renderer_init(void)
 	sprog.uflocs[mmatrix_loc] = glGetUniformLocation(sprog.id, "MMatrix");
 	sprog.uflocs[img_loc] = glGetUniformLocation(sprog.id, "img");
 	sprog.uflocs[opac_loc] = glGetUniformLocation(sprog.id, "opacity");
-	sprog.uflocs[selected_loc] = glGetUniformLocation(sprog.id, "selected");
+	sprog.uflocs[sel_loc] = glGetUniformLocation(sprog.id, "selected");
 
 	init_vobject();
 	check_gl_error("init_vobject");
@@ -67,11 +68,12 @@ void render_img(const struct texture_info *img, const GLfloat *mmatrix,
 {
 	shader_program_bind(&sprog);
 
-	glUniformMatrix4fv(sprog.uflocs[pmatrix_loc], 1, GL_FALSE, (const GLfloat *) size_ortho_matrix);
+	glUniformMatrix4fv(sprog.uflocs[pmatrix_loc], 1, GL_FALSE,
+			   (const GLfloat *) size_ortho_matrix);
 	glUniformMatrix4fv(sprog.uflocs[mmatrix_loc], 1, GL_FALSE, mmatrix);
 	glUniform1i(sprog.uflocs[img_loc], 0);
 	glUniform1f(sprog.uflocs[opac_loc], opacity);
-	glUniform1i(sprog.uflocs[selected_loc], selected);
+	glUniform1i(sprog.uflocs[sel_loc], selected);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, img->id);

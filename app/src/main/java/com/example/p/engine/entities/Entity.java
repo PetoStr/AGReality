@@ -21,7 +21,7 @@ public abstract class Entity implements Movable, TouchListener {
 
 	private boolean isVisible = true;
 
-	float[] modelMatrix = new float[16];
+	private float[] modelMatrix = new float[16];
 
 	private Scene scene;
 
@@ -31,7 +31,7 @@ public abstract class Entity implements Movable, TouchListener {
 
 	private TouchListener touchListener;
 
-	public Entity(Scene scene, Resource resource) {
+	Entity(Scene scene, Resource resource) {
 		this.scene = scene;
 		this.resource = resource;
 
@@ -127,26 +127,20 @@ public abstract class Entity implements Movable, TouchListener {
 		return aabbf;
 	}
 
-	public Vector3f getMin() {
+	private Vector3f getMin() {
 		return min;
 	}
 
-	public void setMin(Vector3f min) {
-		this.min = min;
-	}
-
+	@SuppressWarnings("unused") // called via JNI
 	public void setMin(float x, float y, float z) {
 		this.min = new Vector3f(x, y, z);
 	}
 
-	public Vector3f getMax() {
+	private Vector3f getMax() {
 		return max;
 	}
 
-	public void setMax(Vector3f max) {
-		this.max = max;
-	}
-
+	@SuppressWarnings("unused") // called via JNI
 	public void setMax(float x, float y, float z) {
 		this.max = new Vector3f(x, y, z);
 	}
@@ -155,10 +149,7 @@ public abstract class Entity implements Movable, TouchListener {
 		return center;
 	}
 
-	public void setCenter(Vector3f center) {
-		this.center = center;
-	}
-
+	@SuppressWarnings("unused") // called via JNI
 	public void setCenter(float x, float y, float z) {
 		this.center = new Vector3f(x, y, z);
 	}
@@ -179,6 +170,7 @@ public abstract class Entity implements Movable, TouchListener {
 		isSelected = selected;
 	}
 
+	@SuppressWarnings({"unused", "WeakerAccess"}) // called via JNI
 	public float[] getModelMatrix() {
 		return modelMatrix;
 	}

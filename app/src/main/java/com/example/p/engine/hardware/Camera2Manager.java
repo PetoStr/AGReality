@@ -1,8 +1,6 @@
 package com.example.p.engine.hardware;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -36,7 +34,7 @@ public enum Camera2Manager implements SurfaceTexture.OnFrameAvailableListener, A
 
 	INSTANCE;
 
-	private static final String TAG = Camera2Manager.class.getName();
+	private static final String TAG = "Camera2Manager";
 
 	private String cameraId;
 
@@ -114,40 +112,52 @@ public enum Camera2Manager implements SurfaceTexture.OnFrameAvailableListener, A
 	}
 
 	private void openCamera() {
-		int cameraPermission = ActivityCompat.checkSelfPermission(App.getContext(), Manifest.permission.CAMERA);
+		int cameraPermission =
+				ActivityCompat.checkSelfPermission(App.getContext(), Manifest.permission.CAMERA);
 		if (cameraPermission != PackageManager.PERMISSION_GRANTED) {
 			return;
 		}
 
-		CameraManager manager = (CameraManager) App.getContext().getSystemService(Context.CAMERA_SERVICE);
+		CameraManager manager =
+				(CameraManager) App.getContext().getSystemService(Context.CAMERA_SERVICE);
 		try {
 			for (String cameraId : manager.getCameraIdList()) {
 				CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-				if (characteristics.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) {
-					Log.d(TAG, cameraId);
-					StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-					previewSize = map.getOutputSizes(SurfaceTexture.class)[0];
-
-					// Find out if we need to swap dimension to get the preview size relative to sensor
-					// coordinate.
-					Display display = ((WindowManager) App.getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-					int displayRotation = display.getRotation();
-					//noinspection ConstantConditions
-					sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
-
-					if (displayRotation == Configuration.ORIENTATION_PORTRAIT) {
-						Size old = previewSize;
-						previewSize = new Size(old.getHeight(), old.getWidth());
-					}
-
-					this.cameraId = cameraId;
-					if (!cameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
-						throw new RuntimeException("Time out waiting to lock camera opening.");
-					}
-
-					manager.openCamera(cameraId, stateCallback, cameraHandler);
-					break;
+				Integer lens = characteristics.get(CameraCharacteristics.LENS_FACING);
+				if (lens == null || lens != CameraCharacteristics.LENS_FACING_BACK) {
+					continue;
 				}
+
+				Log.d(TAG, cameraId);
+				StreamConfigurationMap map =
+						characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+				if (map == null) {
+					Log.e(TAG, "map is null");
+					return;
+				}
+				previewSize = map.getOutputSizes(SurfaceTexture.class)[0];
+
+				// Find out if we need to swap dimension to get the preview size relative to sensor
+				// coordinate.
+				WindowManager windowManager =
+						(WindowManager) App.getContext().getSystemService(Context.WINDOW_SERVICE);
+				Display display = windowManager.getDefaultDisplay();
+				int displayRotation = display.getRotation();
+				//noinspection ConstantConditions
+				sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+
+				if (displayRotation == Configuration.ORIENTATION_PORTRAIT) {
+					Size old = previewSize;
+					previewSize = new Size(old.getHeight(), old.getWidth());
+				}
+
+				this.cameraId = cameraId;
+				if (!cameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+					throw new RuntimeException("Time out waiting to lock camera opening.");
+				}
+
+				manager.openCamera(cameraId, stateCallback, cameraHandler);
+				break;
 			}
 		} catch (CameraAccessException | InterruptedException e) {
 			e.printStackTrace();
@@ -200,7 +210,8 @@ public enum Camera2Manager implements SurfaceTexture.OnFrameAvailableListener, A
 	};
 
 	private Range<Integer> getRange() {
-		CameraManager cameraManager = (CameraManager) App.getContext().getSystemService(Context.CAMERA_SERVICE);
+		CameraManager cameraManager =
+				(CameraManager) App.getContext().getSystemService(Context.CAMERA_SERVICE);
 		CameraCharacteristics chars = null;
 
 		try {
@@ -209,9 +220,19 @@ public enum Camera2Manager implements SurfaceTexture.OnFrameAvailableListener, A
 			e.printStackTrace();
 		}
 
-		Range<Integer>[] ranges = chars.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
-		Range<Integer> result = null;
+		if (chars == null) {
+			Log.e(TAG, "no camera characteristics found");
+			return null;
+		}
 
+		Range<Integer>[] ranges =
+				chars.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
+		if (ranges == null) {
+			Log.e(TAG, "no fps ranges found");
+			return null;
+		}
+
+		Range<Integer> result = null;
 		for (Range<Integer> range : ranges) {
 			int upper = range.getUpper();
 
@@ -230,13 +251,16 @@ public enum Camera2Manager implements SurfaceTexture.OnFrameAvailableListener, A
 
 		Surface surface = new Surface(surfaceTexture);
 		try {
-			captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+			captureRequestBuilder =
+					cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 			captureRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, getRange());
 			captureRequestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, false);
-			captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+			captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
+									  CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
 			captureRequestBuilder.addTarget(surface);
 
-			cameraDevice.createCaptureSession(Collections.singletonList(surface), new CameraCaptureSession.StateCallback() {
+			cameraDevice.createCaptureSession(Collections.singletonList(surface),
+											  new CameraCaptureSession.StateCallback() {
 				@Override
 				public void onConfigured(@NonNull CameraCaptureSession session) {
 					Log.v(TAG, "onConfigured(): " + session);

@@ -2,6 +2,7 @@
 #define __ENTITY_H__
 
 #include <assimp/vector3.h>
+
 #include "mesh.h"
 
 struct model_info {
@@ -16,4 +17,3 @@ struct model_info {
 };
 
 #endif
-

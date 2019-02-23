@@ -3,7 +3,8 @@
 
 #include <GLES3/gl3.h>
 
-#include "linmath.h"
+#include <linmath.h>
+
 #include "texture.h"
 
 void img_renderer_init(void);

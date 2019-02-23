@@ -44,13 +44,6 @@ public class TouchPicker {
 			Vector3f B = new Vector3f(bx, by, D.z);
 			Vector3f M = new Vector3f(tx, ty, 0.0f);
 
-			/*AABBf aabbf = e.getAabbf();
-
-			Vector3f D = new Vector3f(aabbf.minX, aabbf.minY, aabbf.minZ);
-			Vector3f B = new Vector3f(aabbf.maxX, aabbf.maxY, aabbf.maxZ);
-			Vector3f A = new Vector3f(D.x, B.y, D.z);
-			Vector3f C = new Vector3f(B.x, D.y, D.z);*/
-
 			Vector3f AM = new Vector3f(M.x - A.x, M.y - A.y, M.z - A.z);
 			Vector3f AB = new Vector3f(B.x - A.x, B.y - A.y, B.z - A.z);
 			Vector3f AD = new Vector3f(D.x - A.x, D.y - A.y, D.z - A.z);
@@ -94,7 +87,6 @@ public class TouchPicker {
 		float h = Screen.getHeight();
 
 		float x = (2.0f * tx) / w - 1.0f;
-		//float y = 1.0f - (2.0f * ty) / h;
 		float y = (2.0f * ty) / h - 1.0f;
 		float z = 1.0f;
 
@@ -109,9 +101,6 @@ public class TouchPicker {
 		Vector3f rayWor = new Vector3f(rayEye.x, rayEye.y, rayEye.z);
 		rayWor.normalize();
 
-		/*RayAabIntersection rai = new RayAabIntersection(camPos.x, camPos.y, camPos.z,
-														rayWor.x, rayWor.y, rayWor.z);*/
-
 		float closestDist = Float.POSITIVE_INFINITY;
 
 		Vector2f nearFar = new Vector2f();
@@ -122,7 +111,6 @@ public class TouchPicker {
 
 			AABBf aabbf = me.getAabbf();
 			Rayf ray = new Rayf(camPos, rayWor);
-			//if (rai.test(aabbf.minX, aabbf.minY, aabbf.minZ, aabbf.maxX, aabbf.maxY, aabbf.maxZ)) {
 			if (Intersectionf.intersectRayAab(ray, aabbf, nearFar)
 					&& nearFar.x < closestDist) {
 				closestDist = nearFar.x;

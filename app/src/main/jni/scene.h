@@ -18,7 +18,6 @@ void free_model(struct model_info *model);
 void free_models(void);
 
 int get_img_id(const char *path, size_t path_len);
-struct texture_info *get_img(int id);
 void free_imgs(void);
 
 #endif

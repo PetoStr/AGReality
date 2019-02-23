@@ -2,7 +2,6 @@ package com.example.p.engine;
 
 import android.opengl.Matrix;
 
-import com.example.p.engine.hardware.Camera2Manager;
 import com.example.p.engine.hardware.DeviceMovement;
 
 import org.joml.Vector3f;
@@ -15,9 +14,6 @@ public class Camera implements Movable {
 	private float[] viewMatrix = new float[16];
 
 	private void calculateViewMatrix() {
-		//float[] orientation = DeviceMovement.INSTANCE.getOrientationAngles();
-		//rotation.set(-orientation[0], -orientation[1], -orientation[2]);
-
 		float x = (float) (position.x + Math.sin(orientation.x) * Math.cos(orientation.y));
 		float y = (float) (position.y + Math.sin(orientation.y));
 		float z = (float) (position.z + Math.cos(orientation.x) * Math.cos(orientation.y));
@@ -28,27 +24,12 @@ public class Camera implements Movable {
 				position.z
 		};
 
-		/*float[] center = {
-				(float) (position.x + Math.sin(orientation.y) * Math.cos(orientation.x)),
-				(float) (position.y + Math.sin(orientation.x)),
-				(float) (position.z + Math.cos(orientation.y) * Math.cos(orientation.x))
-		};*/
-        /*float dist = (float) Math.sqrt(center[0] * center[0] + center[1] * center[1] + center[2] * center[2]);
-        center[0] = center[0] / dist;
-		center[1] = center[1] / dist;
-		center[2] = center[2] / dist;*/
-
-		//float[] up = { 0.0f, 1.0f, 0.0f };
 		float[] up = {
 				(float) (Math.cos(orientation.x) * Math.sin(orientation.z)),
 				(float) (Math.cos(orientation.z)),
 				(float) (Math.sin(-orientation.x) * Math.sin(orientation.z))
 		};
 
-        /*Matrix.setLookAtM(viewMatrix,0,
-                0.0f, 0.0f, 0.0f,
-                center[0], center[1], center[2],
-                up[0], up[1], up[2]);*/
 		Matrix.setLookAtM(viewMatrix, 0,
 				eye[0], eye[1], eye[2],
 				x, y, z,
@@ -80,6 +61,7 @@ public class Camera implements Movable {
 		return position;
 	}
 
+	@SuppressWarnings("unused") // called via JNI
 	public float[] getPositionArray() {
 		return new float[] { position.x, position.y, position.z };
 	}

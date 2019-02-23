@@ -1,6 +1,7 @@
 package com.example.p.agreality.logics;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.util.Size;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -33,6 +34,7 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainLogic extends AbstractLogic  {
 
@@ -51,106 +53,120 @@ public class MainLogic extends AbstractLogic  {
 	private double startTime;
 	private float frameTime;
 
+	private boolean isDebug;
+
 	public MainLogic(LogicState logicState) {
 		super(logicState);
+		ApplicationInfo appInfo = App.getContext().getApplicationInfo();
+		isDebug = (appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 	}
 
 	private void initRotGui() {
-		float w = Screen.getWidth() / 8.0f;
-		float h = w;
+		float size = Screen.getWidth() / 8.0f;
 
-		Vector2f rMid = new Vector2f(Screen.getWidth() - 5 * w / 3, 5 * h / 3);
+		Vector2f rMid = new Vector2f(Screen.getWidth() - 5 * size / 3, 5 * size / 3);
 		float speed = Config.ROTATION_SPEED;
 
-		ImageEntity rotatePX = new RotationButton(scene, Config.IMAGE_RPX, new Vector3f(speed, 0.0f, 0.0f));
-		rotatePX.setPosition(new Vector3f(rMid.x - w / 2, rMid.y + h / 2, 0.0f));
-		rotatePX.setWidth(w);
-		rotatePX.setHeight(h);
+		ImageEntity rotatePX =
+				new RotationButton(scene, Config.IMAGE_RPX, new Vector3f(speed, 0.0f, 0.0f));
+		rotatePX.setPosition(new Vector3f(rMid.x - size / 2, rMid.y + size / 2, 0.0f));
+		rotatePX.setWidth(size);
+		rotatePX.setHeight(size);
 		scene.getImageEntities().add(rotatePX);
 		controlImgs.add(rotatePX);
 
-		ImageEntity rotateNX = new RotationButton(scene, Config.IMAGE_RNX, new Vector3f(-speed, 0.0f, 0.0f));
-		rotateNX.setPosition(new Vector3f(rMid.x - w / 2, rMid.y - 3 * h / 2, 0.0f));
-		rotateNX.setWidth(w);
-		rotateNX.setHeight(h);
+		ImageEntity rotateNX =
+				new RotationButton(scene, Config.IMAGE_RNX, new Vector3f(-speed, 0.0f, 0.0f));
+		rotateNX.setPosition(new Vector3f(rMid.x - size / 2, rMid.y - 3 * size / 2, 0.0f));
+		rotateNX.setWidth(size);
+		rotateNX.setHeight(size);
 		scene.getImageEntities().add(rotateNX);
 		controlImgs.add(rotateNX);
 
-		ImageEntity rotatePY = new RotationButton(scene, Config.IMAGE_RPY, new Vector3f(0.0f, speed, 0.0f));
-		rotatePY.setPosition(new Vector3f(rMid.x - 3 * w / 2, rMid.y - h / 2, 0.0f));
-		rotatePY.setWidth(w);
-		rotatePY.setHeight(h);
+		ImageEntity rotatePY =
+				new RotationButton(scene, Config.IMAGE_RPY, new Vector3f(0.0f, speed, 0.0f));
+		rotatePY.setPosition(new Vector3f(rMid.x - 3 * size / 2, rMid.y - size / 2, 0.0f));
+		rotatePY.setWidth(size);
+		rotatePY.setHeight(size);
 		scene.getImageEntities().add(rotatePY);
 		controlImgs.add(rotatePY);
 
-		ImageEntity rotateNY = new RotationButton(scene, Config.IMAGE_RNY, new Vector3f(0.0f, -speed, 0.0f));
-		rotateNY.setPosition(new Vector3f(rMid.x + w / 2, rMid.y - h / 2, 0.0f));
-		rotateNY.setWidth(w);
-		rotateNY.setHeight(h);
+		ImageEntity rotateNY =
+				new RotationButton(scene, Config.IMAGE_RNY, new Vector3f(0.0f, -speed, 0.0f));
+		rotateNY.setPosition(new Vector3f(rMid.x + size / 2, rMid.y - size / 2, 0.0f));
+		rotateNY.setWidth(size);
+		rotateNY.setHeight(size);
 		scene.getImageEntities().add(rotateNY);
 		controlImgs.add(rotateNY);
 
-		ImageEntity rotatePZ = new RotationButton(scene, Config.IMAGE_RPZ, new Vector3f(0.0f, 0.0f, speed));
-		rotatePZ.setPosition(new Vector3f(rMid.x + w / 2, rMid.y - 3 * h / 2, 0.0f));
-		rotatePZ.setWidth(w);
-		rotatePZ.setHeight(h);
+		ImageEntity rotatePZ =
+				new RotationButton(scene, Config.IMAGE_RPZ, new Vector3f(0.0f, 0.0f, speed));
+		rotatePZ.setPosition(new Vector3f(rMid.x + size / 2, rMid.y - 3 * size / 2, 0.0f));
+		rotatePZ.setWidth(size);
+		rotatePZ.setHeight(size);
 		scene.getImageEntities().add(rotatePZ);
 		controlImgs.add(rotatePZ);
 
-		ImageEntity rotateNZ = new RotationButton(scene, Config.IMAGE_RNZ, new Vector3f(0.0f, 0.0f, -speed));
-		rotateNZ.setPosition(new Vector3f(rMid.x - 3 * w / 2, rMid.y - 3 * h / 2, 0.0f));
-		rotateNZ.setWidth(w);
-		rotateNZ.setHeight(h);
+		ImageEntity rotateNZ =
+				new RotationButton(scene, Config.IMAGE_RNZ, new Vector3f(0.0f, 0.0f, -speed));
+		rotateNZ.setPosition(new Vector3f(rMid.x - 3 * size / 2, rMid.y - 3 * size / 2, 0.0f));
+		rotateNZ.setWidth(size);
+		rotateNZ.setHeight(size);
 		scene.getImageEntities().add(rotateNZ);
 		controlImgs.add(rotateNZ);
 	}
 
 	private void initMovGui() {
-		float w = Screen.getWidth() / 8.0f;
-		float h = w;
+		float size = Screen.getWidth() / 8.0f;
 
-		Vector2f rMid = new Vector2f(5 * w / 3, 5 * h / 3);
+		Vector2f rMid = new Vector2f(5 * size / 3, 5 * size / 3);
 		float speed = Config.MOVE_SPEED;
 
-		ImageEntity movePY = new MovementButton(scene, Config.IMAGE_MUP, new Vector3f(0.0f, speed, 0.0f));
-		movePY.setPosition(new Vector3f(rMid.x + w / 2, rMid.y - 3 * h / 2, 0.0f));
-		movePY.setWidth(w);
-		movePY.setHeight(h);
+		ImageEntity movePY =
+				new MovementButton(scene, Config.IMAGE_MUP, new Vector3f(0.0f, speed, 0.0f));
+		movePY.setPosition(new Vector3f(rMid.x + size / 2, rMid.y - 3 * size / 2, 0.0f));
+		movePY.setWidth(size);
+		movePY.setHeight(size);
 		scene.getImageEntities().add(movePY);
 		controlImgs.add(movePY);
 
-		ImageEntity moveNY = new MovementButton(scene, Config.IMAGE_MDOWN, new Vector3f(0.0f, -speed, 0.0f));
-		moveNY.setPosition(new Vector3f(rMid.x - 3 * w / 2, rMid.y - 3 * h / 2, 0.0f));
-		moveNY.setWidth(w);
-		moveNY.setHeight(h);
+		ImageEntity moveNY =
+				new MovementButton(scene, Config.IMAGE_MDOWN, new Vector3f(0.0f, -speed, 0.0f));
+		moveNY.setPosition(new Vector3f(rMid.x - 3 * size / 2, rMid.y - 3 * size / 2, 0.0f));
+		moveNY.setWidth(size);
+		moveNY.setHeight(size);
 		scene.getImageEntities().add(moveNY);
 		controlImgs.add(moveNY);
 
-		ImageEntity movePX = new MovementButton(scene, Config.IMAGE_MLEFT, new Vector3f(speed, 0.0f, 0.0f));
-		movePX.setPosition(new Vector3f(rMid.x - 3 * w / 2, rMid.y - h / 2, 0.0f));
-		movePX.setWidth(w);
-		movePX.setHeight(h);
+		ImageEntity movePX =
+				new MovementButton(scene, Config.IMAGE_MLEFT, new Vector3f(speed, 0.0f, 0.0f));
+		movePX.setPosition(new Vector3f(rMid.x - 3 * size / 2, rMid.y - size / 2, 0.0f));
+		movePX.setWidth(size);
+		movePX.setHeight(size);
 		scene.getImageEntities().add(movePX);
 		controlImgs.add(movePX);
 
-		ImageEntity moveNX = new MovementButton(scene, Config.IMAGE_MRIGHT, new Vector3f(-speed, 0.0f, 0.0f));
-		moveNX.setPosition(new Vector3f(rMid.x + w / 2, rMid.y - h / 2, 0.0f));
-		moveNX.setWidth(w);
-		moveNX.setHeight(h);
+		ImageEntity moveNX =
+				new MovementButton(scene, Config.IMAGE_MRIGHT, new Vector3f(-speed, 0.0f, 0.0f));
+		moveNX.setPosition(new Vector3f(rMid.x + size / 2, rMid.y - size / 2, 0.0f));
+		moveNX.setWidth(size);
+		moveNX.setHeight(size);
 		scene.getImageEntities().add(moveNX);
 		controlImgs.add(moveNX);
 
-		ImageEntity movePZ = new MovementButton(scene, Config.IMAGE_MFRONT, new Vector3f(0.0f, 0.0f, speed));
-		movePZ.setPosition(new Vector3f(rMid.x - w / 2, rMid.y + h / 2, 0.0f));
-		movePZ.setWidth(w);
-		movePZ.setHeight(h);
+		ImageEntity movePZ =
+				new MovementButton(scene, Config.IMAGE_MFRONT, new Vector3f(0.0f, 0.0f, speed));
+		movePZ.setPosition(new Vector3f(rMid.x - size / 2, rMid.y + size / 2, 0.0f));
+		movePZ.setWidth(size);
+		movePZ.setHeight(size);
 		scene.getImageEntities().add(movePZ);
 		controlImgs.add(movePZ);
 
-		ImageEntity moveNZ = new MovementButton(scene, Config.IMAGE_MBACK, new Vector3f(0.0f, 0.0f, -speed));
-		moveNZ.setPosition(new Vector3f(rMid.x - w / 2, rMid.y - 3 * h / 2, 0.0f));
-		moveNZ.setWidth(w);
-		moveNZ.setHeight(h);
+		ImageEntity moveNZ =
+				new MovementButton(scene, Config.IMAGE_MBACK, new Vector3f(0.0f, 0.0f, -speed));
+		moveNZ.setPosition(new Vector3f(rMid.x - size / 2, rMid.y - 3 * size / 2, 0.0f));
+		moveNZ.setWidth(size);
+		moveNZ.setHeight(size);
 		scene.getImageEntities().add(moveNZ);
 		controlImgs.add(moveNZ);
 	}
@@ -159,16 +175,15 @@ public class MainLogic extends AbstractLogic  {
 		initRotGui();
 		initMovGui();
 
-		float w = Screen.getWidth() / 8.0f;
-		float h = w;
+		float size = Screen.getWidth() / 8.0f;
 
-		float posX = Screen.getWidth() - 5 * w / 3 + w / 2;
-		float posY = Screen.getHeight() / 2 - h / 2;
+		float posX = Screen.getWidth() - 5 * size / 3 + size / 2;
+		float posY = Screen.getHeight() / 2 - size / 2;
 
 		ImageEntity showList = new SimpleButton(scene, Config.IMAGE_PLUS);
 		showList.setPosition(new Vector3f(posX, posY, 0.0f));
-		showList.setWidth(w);
-		showList.setHeight(h);
+		showList.setWidth(size);
+		showList.setHeight(size);
 		scene.getImageEntities().add(showList);
 		controlImgs.add(showList);
 
@@ -179,16 +194,15 @@ public class MainLogic extends AbstractLogic  {
 	}
 
 	private void initListElements() {
-		float w = Screen.getWidth() / 8.0f;
-		float h = w;
+		float size = Screen.getWidth() / 8.0f;
 
-		float posX = 5 * w / 3;
-		float posY = 5 * h / 3;
+		float posX = 5 * size / 3;
+		float posY = 5 * size / 3;
 
 		ImageEntity earthElement = new SimpleButton(scene, Config.IMAGE_EARTH);
 		earthElement.setPosition(new Vector3f(posX, posY, 0.0f));
-		earthElement.setWidth(w);
-		earthElement.setHeight(h);
+		earthElement.setWidth(size);
+		earthElement.setHeight(size);
 		earthElement.setVisible(false);
 		scene.getImageEntities().add(earthElement);
 		listImgs.add(earthElement);
@@ -203,12 +217,12 @@ public class MainLogic extends AbstractLogic  {
 			showListImgs(false);
 		});
 
-		posX += 2.0f * w;
+		posX += 2.0f * size;
 
 		ImageEntity wraithElement = new SimpleButton(scene, Config.IMAGE_WRAITH);
 		wraithElement.setPosition(new Vector3f(posX, posY, 0.0f));
-		wraithElement.setWidth(w);
-		wraithElement.setHeight(h);
+		wraithElement.setWidth(size);
+		wraithElement.setHeight(size);
 		wraithElement.setVisible(false);
 		scene.getImageEntities().add(wraithElement);
 		listImgs.add(wraithElement);
@@ -223,12 +237,12 @@ public class MainLogic extends AbstractLogic  {
 			showListImgs(false);
 		});
 
-		posX += 2.0f * w;
+		posX += 2.0f * size;
 
 		ImageEntity officeChairElement = new SimpleButton(scene, Config.IMAGE_OFFICE_CHAIR);
 		officeChairElement.setPosition(new Vector3f(posX, posY, 0.0f));
-		officeChairElement.setWidth(w);
-		officeChairElement.setHeight(h);
+		officeChairElement.setWidth(size);
+		officeChairElement.setHeight(size);
 		officeChairElement.setVisible(false);
 		scene.getImageEntities().add(officeChairElement);
 		listImgs.add(officeChairElement);
@@ -243,12 +257,12 @@ public class MainLogic extends AbstractLogic  {
 			showListImgs(false);
 		});
 
-		posY += 2.0f * h;
+		posY += 2.0f * size;
 
 		ImageEntity tableElement = new SimpleButton(scene, Config.IMAGE_TABLE);
 		tableElement.setPosition(new Vector3f(posX, posY, 0.0f));
-		tableElement.setWidth(w);
-		tableElement.setHeight(h);
+		tableElement.setWidth(size);
+		tableElement.setHeight(size);
 		tableElement.setVisible(false);
 		scene.getImageEntities().add(tableElement);
 		listImgs.add(tableElement);
@@ -263,12 +277,12 @@ public class MainLogic extends AbstractLogic  {
 			showListImgs(false);
 		});
 
-		posX -= 2.0f * w;
+		posX -= 2.0f * size;
 
 		ImageEntity roomElement = new SimpleButton(scene, Config.IMAGE_ROOM);
 		roomElement.setPosition(new Vector3f(posX, posY, 0.0f));
-		roomElement.setWidth(w);
-		roomElement.setHeight(h);
+		roomElement.setWidth(size);
+		roomElement.setHeight(size);
 		roomElement.setVisible(false);
 		scene.getImageEntities().add(roomElement);
 		listImgs.add(roomElement);
@@ -283,16 +297,15 @@ public class MainLogic extends AbstractLogic  {
 	}
 
 	private void initListGui() {
-		float w = Screen.getWidth() / 8.0f;
-		float h = w;
+		float size = Screen.getWidth() / 8.0f;
 
-		float posX = Screen.getWidth() - 5 * w / 3 + w / 2;
-		float posY = Screen.getHeight() / 2 - h / 2;
+		float posX = Screen.getWidth() - 5 * size / 3 + size / 2;
+		float posY = Screen.getHeight() / 2 - size / 2;
 
 		ImageEntity hideList = new SimpleButton(scene, Config.IMAGE_X);
 		hideList.setPosition(new Vector3f(posX, posY, 0.0f));
-		hideList.setWidth(w);
-		hideList.setHeight(h);
+		hideList.setWidth(size);
+		hideList.setHeight(size);
 		hideList.setVisible(false);
 		scene.getImageEntities().add(hideList);
 		listImgs.add(hideList);
@@ -309,66 +322,34 @@ public class MainLogic extends AbstractLogic  {
 		initControlGui();
 		initListGui();
 
-		float w = Screen.getWidth() / 8.0f;
-		float h = w;
+		float size = Screen.getWidth() / 8.0f;
 
-		float posX = 5 * w / 3 - 3 * w / 2;
-		float posY = Screen.getHeight() / 2 - h / 2;
+		float posX = 5 * size / 3 - 3 * size / 2;
+		float posY = Screen.getHeight() / 2 - size / 2;
 
 		ImageEntity removeModel = new SimpleButton(scene, Config.IMAGE_REMOVE);
 		removeModel.setPosition(new Vector3f(posX, posY, 0.0f));
-		removeModel.setWidth(w);
-		removeModel.setHeight(h);
+		removeModel.setWidth(size);
+		removeModel.setHeight(size);
 		scene.getImageEntities().add(removeModel);
 
-		removeModel.registerOnTouch(() -> {
-			modeledEntitiesToRemove.add(scene.getSelectedModeledEntity());
-		});
+		removeModel.registerOnTouch(() ->
+			modeledEntitiesToRemove.add(scene.getSelectedModeledEntity())
+		);
 
-		posX = Screen.getWidth() - posX - w;
-		posY -= 2 * h;
+		posX = Screen.getWidth() - posX - size;
+		posY -= 2 * size;
 
 		ImageEntity setDirLight = new SetDirLightButton(scene);
 		setDirLight.setPosition(new Vector3f(posX, posY, 0.0f));
-		setDirLight.setWidth(w);
-		setDirLight.setHeight(h);
+		setDirLight.setWidth(size);
+		setDirLight.setHeight(size);
 		scene.getImageEntities().add(setDirLight);
 	}
 
 	private void initScene() {
 		scene = new CustomScene();
-
 		scene.setSelectedModeledEntity(new NullModelEntity());
-
-		/*ModeledEntity wolf = new ModeledEntity(scene, Config.MODEL_WOLF);
-		wolf.setPosition(new Vector3f(0.0f, -10.0f, 35.0f));
-		scene.getModeledEntities().add(wolf);*/
-
-		/*ModeledEntity nanosuit = new Nanosuit(scene);
-		nanosuit.setPosition(new Vector3f(0.0f, -10.0f, 35.0f));
-		addModeledEntity(nanosuit);
-
-		ModeledEntity nanosuit3 = new Nanosuit(scene);
-		nanosuit3.setPosition(new Vector3f(-3.0f, -10.0f, 45.0f));
-		addModeledEntity(nanosuit3);
-
-		ModeledEntity nanosuit2 = new Nanosuit(scene);
-		nanosuit2.setPosition(new Vector3f(15.0f, -10.0f, 30.0f));
-		addModeledEntity(nanosuit2);*/
-
-		/*ModeledEntity wraith = new Wraith(scene);
-		wraith.setPosition(new Vector3f(15.0f, -10.0f, 30.0f));
-		addModeledEntity(wraith);*/
-
-		//scene.getCamera().move(new Vector3f(0.0f, 0.0f, -30.0f));
-
-		/*e = new Entity(new Vector3f(), new Vector3f(), new Vector3f(1.0f), sculpt);
-		e.getOrientation().x -= 90.0f;
-		e.getPosition().y -= 25.0f;
-		e.getPosition().z = -73.0f;*/
-		//scene.getEntities().add(e);
-
-		//scene.getCamera().move(new Vector3f(0.0f, 0.0f, -10.0f));
 	}
 
 	private void showControlImgs(boolean show) {
@@ -388,11 +369,13 @@ public class MainLogic extends AbstractLogic  {
 		Vector3f camDir = new Vector3f(-vMatrix[2], -vMatrix[6], -vMatrix[10]);
 		Vector3f camPos = scene.getCamera().getPosition();
 
-		return new Vector3f(camDir).mul(30.0f).add(camPos);
+		return new Vector3f(camDir).mul(Config.DISPLACEMENT_FROM_CAMERA).add(camPos);
 	}
 
 	private float getCameraRotation() {
-		Display display = ((WindowManager) App.getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		WindowManager windowManager =
+				(WindowManager) App.getContext().getSystemService(Context.WINDOW_SERVICE);
+		Display display = windowManager.getDefaultDisplay();
 		int dispRotation = display.getRotation();
 		return (float) Math.toRadians(Camera2Manager.INSTANCE.getOrientation(dispRotation));
 	}
@@ -440,20 +423,29 @@ public class MainLogic extends AbstractLogic  {
 
 		renderer.draw(scene);
 
-		float h = Screen.getHeight();
+		if (isDebug) {
+			float h = Screen.getHeight();
 
-		float[] angles = DeviceMovement.INSTANCE.getOrientationAngles();
-		renderer.draw_text(String.valueOf((int) Math.toDegrees(angles[0])), 48.0f, h - 144.0f, 1.0f, textColor);
-		renderer.draw_text(String.valueOf((int) Math.toDegrees(angles[1])), 48.0f, h - 096.0f, 1.0f, textColor);
-		renderer.draw_text(String.valueOf((int) Math.toDegrees(angles[2])), 48.0f, h - 048.0f, 1.0f, textColor);
+			float[] angles = DeviceMovement.INSTANCE.getOrientationAngles();
+			renderer.draw_text(String.valueOf((int) Math.toDegrees(angles[0])),
+							   48.0f, h - 144.0f, 1.0f, textColor);
+			renderer.draw_text(String.valueOf((int) Math.toDegrees(angles[1])),
+							   48.0f, h - 096.0f, 1.0f, textColor);
+			renderer.draw_text(String.valueOf((int) Math.toDegrees(angles[2])),
+							   48.0f, h - 048.0f, 1.0f, textColor);
 
-		float[] accels = DeviceMovement.INSTANCE.getEarthAcceleration();
-		renderer.draw_text(String.valueOf(accels[0]), 248.0f, h - 154.0f, 1.0f, textColor);
-		renderer.draw_text(String.valueOf(accels[1]), 248.0f, h - 106.0f, 1.0f, textColor);
-		renderer.draw_text(String.valueOf(accels[2]), 248.0f, h - 048.0f, 1.0f, textColor);
+			float[] accels = DeviceMovement.INSTANCE.getPosition();
+			renderer.draw_text(String.valueOf(accels[0]),
+							   248.0f, h - 154.0f, 1.0f, textColor);
+			renderer.draw_text(String.valueOf(accels[1]),
+							   248.0f, h - 106.0f, 1.0f, textColor);
+			renderer.draw_text(String.valueOf(accels[2]),
+							   248.0f, h - 048.0f, 1.0f, textColor);
 
-		float averageFps = 1.0f / frameTime;
-		renderer.draw_text(String.format("%.1f", averageFps), 48.0f, h - 240.0f, 1.0f, textColor);
+			float averageFps = 1.0f / frameTime;
+			renderer.draw_text(String.format(Locale.US, "%.1f", averageFps),
+							   48.0f, h - 240.0f, 1.0f, textColor);
+		}
 
 		double currTime = System.nanoTime();
 		frameTime = (float) ((currTime - startTime) / 1e9);
@@ -465,11 +457,14 @@ public class MainLogic extends AbstractLogic  {
 		switch (action) {
 			case MotionEvent.ACTION_DOWN:
 			case MotionEvent.ACTION_POINTER_DOWN:
-				ImageEntity e = TouchPicker.handleScreenTouchedEntity(scene.getImageEntities(), x, y);
+				ImageEntity e =
+						TouchPicker.handleScreenTouchedEntity(scene.getImageEntities(), x, y);
 				e.setSelected(true);
 
 				if (e instanceof NullImageEntity) {
-					ModeledEntity m = TouchPicker.handleWorldTouchedEntity(scene.getModeledEntities(), scene.getCamera(), x, y);
+					ModeledEntity m =
+							TouchPicker.handleWorldTouchedEntity(scene.getModeledEntities(),
+																 scene.getCamera(), x, y);
 
 					scene.getSelectedModeledEntity().setSelected(false);
 					scene.setSelectedModeledEntity(m);

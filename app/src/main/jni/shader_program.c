@@ -26,7 +26,7 @@ static void print_shader_info(struct shader_info *shdr)
 	AGR_ERROR("%s compilation failed: %s\n", shdr->fname, m);
 }
 
-static void print_program_info(GLint pid)
+static void print_program_info(GLuint pid)
 {
 	GLint len = 0;
 	glGetProgramiv(pid, GL_INFO_LOG_LENGTH, &len);
@@ -55,7 +55,7 @@ static void create_shader(struct shader_info *shdr, GLenum type)
 	free(src);
 }
 
-static void link_shaders(GLint p, GLint vs, GLint fs)
+static void link_shaders(GLuint p, GLuint vs, GLuint fs)
 {
 	glAttachShader(p, vs);
 	glAttachShader(p, fs);
@@ -84,7 +84,8 @@ static void link_shaders(GLint p, GLint vs, GLint fs)
 	check_gl_error("glDeleteShader");
 }
 
-void create_program(struct program_info *p, const struct shader_attrib *atbs, size_t atbs_len)
+void create_program(struct program_info *p,
+		    const struct shader_attrib *atbs, size_t atbs_len)
 {
 	create_shader(&p->vs, GL_VERTEX_SHADER);
 	create_shader(&p->fs, GL_FRAGMENT_SHADER);
@@ -98,11 +99,4 @@ void create_program(struct program_info *p, const struct shader_attrib *atbs, si
 	}
 
 	link_shaders(p->id, p->vs.id, p->fs.id);
-}
-
-void delete_program(struct program_info *p)
-{
-	shader_program_unbind();
-	glDeleteProgram(p->id);
-	check_gl_error("glDeleteProgram");
 }

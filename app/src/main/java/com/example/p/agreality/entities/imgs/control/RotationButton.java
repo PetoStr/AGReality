@@ -8,7 +8,7 @@ import org.joml.Vector3f;
 
 public class RotationButton extends ImageEntity {
 
-	Vector3f rotation;
+	private Vector3f rotation;
 
 	public RotationButton(CustomScene scene, String path, Vector3f rotation) {
 		super(scene, path);

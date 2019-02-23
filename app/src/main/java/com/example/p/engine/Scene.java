@@ -9,9 +9,7 @@ import java.util.List;
 public class Scene {
 
 	private List<ModeledEntity> modeledEntities = new ArrayList<>();
-
 	private List<ImageEntity> imageEntities = new ArrayList<>();
-	private List<ImageEntity> imageEntitiesToRemove = new ArrayList<>();
 
 	private Camera camera = new Camera();
 
@@ -41,22 +39,16 @@ public class Scene {
 		return modeledEntities;
 	}
 
-	public void setModeledEntities(List<ModeledEntity> modeledEntities) {
-		this.modeledEntities = modeledEntities;
-	}
-
 	public List<ImageEntity> getImageEntities() {
 		return imageEntities;
 	}
 
-	public void setImageEntities(List<ImageEntity> imageEntities) {
-		this.imageEntities = imageEntities;
-	}
-
+	@SuppressWarnings("unused") // called via JNI
 	public ModeledEntity[] getModeledEntitiesArray() {
 		return getModeledEntities().toArray(new ModeledEntity[0]);
 	}
 
+	@SuppressWarnings("unused") // called via JNI
 	public ImageEntity[] getImageEntitiesArray() {
 		return getImageEntities().toArray(new ImageEntity[0]);
 	}

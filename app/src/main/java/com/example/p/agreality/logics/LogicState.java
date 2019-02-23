@@ -22,7 +22,10 @@ public class LogicState {
 		try {
 			constructor = logic.getConstructor(LogicState.class);
 			currLogic = constructor.newInstance(this);
-		} catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+		} catch (NoSuchMethodException
+				| IllegalAccessException
+				| InstantiationException
+				| InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}

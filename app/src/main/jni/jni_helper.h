@@ -25,9 +25,11 @@ int jentity_is_selected(JNIEnv *env, jobject entity);
 
 void jentity_set_min(JNIEnv *env, jobject entity, float x, float y, float z);
 void jentity_set_max(JNIEnv *env, jobject entity, float x, float y, float z);
-void jentity_set_center(JNIEnv *env, jobject entity, float x, float y, float z);
+void jentity_set_center(JNIEnv *env, jobject entity,
+			float x, float y, float z);
 
 float jientity_get_opacity(JNIEnv *env, jobject entity);
-void jientity_set_size(JNIEnv *env, jobject ientity, float width, float height);
+void jientity_set_size(JNIEnv *env, jobject ientity,
+		       float width, float height);
 
 #endif

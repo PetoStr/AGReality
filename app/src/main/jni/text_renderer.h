@@ -3,7 +3,7 @@
 
 #include <GLES3/gl3.h>
 
-#include "linmath.h"
+#include <linmath.h>
 
 void text_renderer_init(void);
 void render_text(const char *str, GLfloat x, GLfloat y,

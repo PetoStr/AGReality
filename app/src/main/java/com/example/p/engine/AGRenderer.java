@@ -4,7 +4,6 @@ import android.content.res.AssetManager;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
-import com.example.p.agreality.MainLoop;
 import com.example.p.engine.hardware.Camera2Manager;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -19,7 +18,7 @@ public class AGRenderer implements GLSurfaceView.Renderer, GLSurfaceView.EGLCont
 
 	private AGLoop agLoop;
 
-	public AGRenderer(AGLoop agLoop) {
+	AGRenderer(AGLoop agLoop) {
 		this.agLoop = agLoop;
 	}
 
@@ -49,8 +48,11 @@ public class AGRenderer implements GLSurfaceView.Renderer, GLSurfaceView.EGLCont
 
 	@Override
 	public EGLContext createContext(EGL10 egl, EGLDisplay display, EGLConfig config) {
-		int[] attrib_list = { EGL_CONTEXT_CLIENT_VERSION, AGSurfaceView.EGL_CONTEXT_CLIENT_VERSION,
-				EGL10.EGL_NONE };
+		int[] attrib_list = {
+				EGL_CONTEXT_CLIENT_VERSION,
+				AGSurfaceView.EGL_CONTEXT_CLIENT_VERSION,
+				EGL10.EGL_NONE
+		};
 
 		return egl.eglCreateContext(display, config, EGL10.EGL_NO_CONTEXT, attrib_list);
 	}

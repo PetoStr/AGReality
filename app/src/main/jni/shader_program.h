@@ -25,7 +25,7 @@ struct shader_attrib {
 
 extern void shader_program_bind(const struct program_info *p);
 extern void shader_program_unbind(void);
-extern void create_program(struct program_info *p, const struct shader_attrib *atbs, size_t atbs_len);
-extern void delete_program(struct program_info *p);
+extern void create_program(struct program_info *p,
+			   const struct shader_attrib *atbs, size_t atbs_len);
 
 #endif

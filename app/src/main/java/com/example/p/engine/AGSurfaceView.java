@@ -12,8 +12,6 @@ public class AGSurfaceView extends GLSurfaceView {
 
 	private AGRenderer agRenderer;
 
-	private AGLoop agLoop;
-
 	public AGSurfaceView(Context context) {
 		super(context);
 
@@ -21,7 +19,7 @@ public class AGSurfaceView extends GLSurfaceView {
 		setPreserveEGLContextOnPause(true);
 		setEGLConfigChooser(8, 8, 8, 8, 16, 0);
 
-		agLoop = new MainLoop();
+		AGLoop agLoop = new MainLoop();
 
 		agRenderer = new AGRenderer(agLoop);
 		setEGLContextFactory(agRenderer);
@@ -29,7 +27,13 @@ public class AGSurfaceView extends GLSurfaceView {
 	}
 
 	@Override
+	public boolean performClick() {
+		return super.performClick();
+	}
+
+	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		performClick();
 		int actionIndex = event.getActionIndex();
 
 		int pointerId = event.getPointerId(actionIndex);
