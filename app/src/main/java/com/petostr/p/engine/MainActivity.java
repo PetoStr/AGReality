@@ -18,7 +18,7 @@ public class MainActivity extends Activity
 	private static AGSensorManager sensorManager;
 
 	static {
-		System.loadLibrary("native-lib");
+		System.loadLibrary("engine");
 	}
 
 	private void initSurfaceView() {

@@ -5,7 +5,7 @@
 #include "pv_matrices.h"
 #include "util.h"
 
-#define BASE_PACKAGE "com/example/p/"
+#define BASE_PACKAGE "com/petostr/p/"
 
 #define CAMERA_CLASS BASE_PACKAGE "engine/Camera"
 #define RESOURCE_CLASS BASE_PACKAGE "engine/entities/Resource"
@@ -213,7 +213,7 @@ void jientity_set_size(JNIEnv *env, jobject ientity,
 }
 
 JNIEXPORT jfloatArray JNICALL
-Java_com_example_p_engine_Screen_get_1pmatrix(JNIEnv *env, jclass type)
+Java_com_petostr_p_engine_Screen_get_1pmatrix(JNIEnv *env, jclass type)
 {
 	UNUSED(type);
 	jfloatArray pm = (*env)->NewFloatArray(env, 16);

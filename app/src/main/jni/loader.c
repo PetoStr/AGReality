@@ -425,7 +425,7 @@ static void aiVector3D_to_float(const struct aiVector3D *vec, float *res)
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_entities_Entity_load(JNIEnv *env, jobject instance)
+Java_com_petostr_p_engine_entities_Entity_load(JNIEnv *env, jobject instance)
 {
 	jobject resource = jget_resource(env, instance);
 	jclass rclass = (*env)->GetObjectClass(env, resource);

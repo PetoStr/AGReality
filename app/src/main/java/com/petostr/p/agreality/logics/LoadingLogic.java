@@ -36,8 +36,6 @@ public class LoadingLogic extends AbstractLogic {
 	}
 
 	private void fillLoadingQueue() {
-		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_GRASS));
-
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_MUP));
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_MDOWN));
 		entitiesToLoad.add(Pair.create(ImageEntity.class, Config.IMAGE_MLEFT));

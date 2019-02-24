@@ -30,8 +30,6 @@ public final class Config {
 
 	private static final String IMAGES_PATH = "imgs/";
 
-	public static final String IMAGE_GRASS = IMAGES_PATH  + "grass.png";
-
 	public static final String IMAGE_MUP = IMAGES_PATH + "mup.png";
 	public static final String IMAGE_MDOWN = IMAGES_PATH + "mdown.png";
 	public static final String IMAGE_MLEFT = IMAGES_PATH + "mleft.png";

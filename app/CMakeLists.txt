@@ -2,8 +2,11 @@ cmake_minimum_required(VERSION 3.4.1)
 
 add_compile_options(-Wall -Werror -Wextra -Wno-unused-parameter)
 
+set(CMAKE_C_FLAGS_DEBUG "-g")
+set(CMAKE_C_FLAGS_RELEASE "-O3")
+
 add_library(
-        native-lib
+        engine
 
         SHARED
 
@@ -22,7 +25,7 @@ add_library(
 )
 
 target_link_libraries(
-        native-lib
+        engine
         android
 )
 
@@ -32,7 +35,7 @@ find_library(
 )
 
 target_link_libraries(
-        native-lib
+        engine
         ${log-lib}
 )
 
@@ -42,7 +45,7 @@ find_library(
 )
 
 target_link_libraries(
-        native-lib
+        engine
         ${gles-lib}
 )
 
@@ -57,13 +60,15 @@ include_directories(${CMAKE_SOURCE_DIR}/src/main/jni/external/stb_image/include)
 
 # FreeType 2
 include_directories(${CMAKE_SOURCE_DIR}/src/main/jni/external/ft2/include)
-target_link_libraries(native-lib ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${CMAKE_ANDROID_ARCH_ABI}/libfreetype.a)
+target_link_libraries(
+        engine
+        ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${CMAKE_ANDROID_ARCH_ABI}/libfreetype.a
+)
 
 
 # Assimp
 include_directories(${CMAKE_SOURCE_DIR}/src/main/jni/external/assimp/include)
-
 target_link_libraries(
-        native-lib
+        engine
         ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${CMAKE_ANDROID_ARCH_ABI}/libassimp.so
 )

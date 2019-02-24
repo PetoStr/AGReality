@@ -50,7 +50,7 @@ static void disable_depth_test(void)
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
+Java_com_petostr_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
 					  jobject assetManager)
 {
 	UNUSED(instance);
@@ -139,7 +139,7 @@ Java_com_example_p_engine_AGRenderer_init(JNIEnv *env, jobject instance,
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_AGRenderer_clear(JNIEnv *env, jobject instance)
+Java_com_petostr_p_engine_AGRenderer_clear(JNIEnv *env, jobject instance)
 {
 	UNUSED(env);
 	UNUSED(instance);
@@ -148,7 +148,7 @@ Java_com_example_p_engine_AGRenderer_clear(JNIEnv *env, jobject instance)
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_Scene_set_1dir_1light_1dir(JNIEnv *env,
+Java_com_petostr_p_engine_Scene_set_1dir_1light_1dir(JNIEnv *env,
 						     jobject instance,
 						     jfloatArray dld)
 {
@@ -161,7 +161,7 @@ Java_com_example_p_engine_Scene_set_1dir_1light_1dir(JNIEnv *env,
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_AGRenderer_surface_1changed(JNIEnv *env,
+Java_com_petostr_p_engine_AGRenderer_surface_1changed(JNIEnv *env,
 						      jobject instance,
 						      jint width, jint height)
 {
@@ -196,7 +196,7 @@ Java_com_example_p_engine_AGRenderer_surface_1changed(JNIEnv *env,
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_AGRenderer_on_1destroy(JNIEnv *env,
+Java_com_petostr_p_engine_AGRenderer_on_1destroy(JNIEnv *env,
 						 jobject instance)
 {
 	UNUSED(env);
@@ -211,7 +211,7 @@ Java_com_example_p_engine_AGRenderer_on_1destroy(JNIEnv *env,
 }
 
 JNIEXPORT jint JNICALL
-Java_com_example_p_engine_AGRenderer_create_1oes_1texture(JNIEnv *env,
+Java_com_petostr_p_engine_AGRenderer_create_1oes_1texture(JNIEnv *env,
 							  jobject instance)
 {
 	UNUSED(env);
@@ -356,7 +356,7 @@ static void draw_models(JNIEnv *env, jobject scene)
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_AGRenderer_draw(JNIEnv *env, jobject instance,
+Java_com_petostr_p_engine_AGRenderer_draw(JNIEnv *env, jobject instance,
 					  jobject scene)
 {
 	UNUSED(instance);
@@ -387,7 +387,7 @@ Java_com_example_p_engine_AGRenderer_draw(JNIEnv *env, jobject instance,
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_AGRenderer_draw_1camera(JNIEnv *env,
+Java_com_petostr_p_engine_AGRenderer_draw_1camera(JNIEnv *env,
 						  jobject instance,
 						  jfloat rotation,
 						  jint width, jint height)
@@ -432,7 +432,7 @@ Java_com_example_p_engine_AGRenderer_draw_1camera(JNIEnv *env,
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_p_engine_AGRenderer_draw_1text(JNIEnv *env, jobject instance,
+Java_com_petostr_p_engine_AGRenderer_draw_1text(JNIEnv *env, jobject instance,
 						jstring text_,
 						jfloat x, jfloat y,
 						jfloat scale,

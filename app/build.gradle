@@ -5,13 +5,13 @@ android {
         config {
             keyAlias 'key0'
             keyPassword 'AGRPassword'
-            storeFile file('/home/peto/android/android.jks')
+            storeFile file('key/agreality.jks')
             storePassword 'AGRPassword'
         }
     }
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.example.p.agreality"
+        applicationId "com.petostr.p.agreality"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
