@@ -340,11 +340,20 @@ public class MainLogic extends AbstractLogic  {
 		posX = Screen.getWidth() - posX - size;
 		posY -= 2 * size;
 
-		ImageEntity setDirLight = new SetDirLightButton(scene);
+		SetDirLightButton setDirLight = new SetDirLightButton(scene);
 		setDirLight.setPosition(new Vector3f(posX, posY, 0.0f));
 		setDirLight.setWidth(size);
 		setDirLight.setHeight(size);
 		scene.getImageEntities().add(setDirLight);
+
+		long startTime = System.nanoTime();
+		while (!DeviceMovement.INSTANCE.isOrientationAnglesDataAvailable()) {
+			if (System.nanoTime() - startTime >= 1e9) {
+				break;
+			}
+		}
+		scene.getCamera().update();
+		setDirLight.setDirLightDirBasedOnCamera();
 	}
 
 	private void initScene() {

@@ -42,6 +42,7 @@ public enum DeviceMovement implements SensorEventListener, AGSensor {
 
 	private final float[] orientationAngles = new float[3];
 	float[] position = new float[3];
+	private boolean orientationAnglesDataAvailable = false;
 
 	private long timestamp;
 	private double[] initVel = new double[3];
@@ -160,6 +161,10 @@ public enum DeviceMovement implements SensorEventListener, AGSensor {
 
 	}
 
+	public boolean isOrientationAnglesDataAvailable() {
+		return orientationAnglesDataAvailable;
+	}
+
 	public float[] getOrientationAngles() {
 		return orientationAngles;
 	}
@@ -191,5 +196,6 @@ public enum DeviceMovement implements SensorEventListener, AGSensor {
 		SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_X,
 				SensorManager.AXIS_Z, outR);
 		SensorManager.getOrientation(outR, orientationAngles);
+		orientationAnglesDataAvailable = true;
 	}
 }
